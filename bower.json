@@ -1,0 +1,15 @@
+{
+	"name": "delite-core",
+	"version": "0.0.1-dev",
+	"dependencies": {
+	},
+	"devDependencies": {
+	},
+	"ignore": [
+		".jshintrc",
+		".gitattributes",
+		".travis.yml",
+		"tests",
+		"CONTRIBUTING.md"
+	]
+}
