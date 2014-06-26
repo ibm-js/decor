@@ -1,4 +1,4 @@
-# delite-core [![Build Status](https://travis-ci.org/ibm-js/delite-core.png?branch=master)](https://travis-ci.org/ibm-js/delite-core)
+# decor [![Build Status](https://travis-ci.org/ibm-js/decor.png?branch=master)](https://travis-ci.org/ibm-js/decor)
 
 This project provides a predefined set of utilities and base modules.
 
@@ -9,7 +9,7 @@ No official release yet.
 ## Issues
 
 Bugs and open issues are tracked in the
-[github issues tracker](https://github.com/ibm-js/delite-core/issues).
+[github issues tracker](https://github.com/ibm-js/decor/issues).
 
 ## Licensing
 
@@ -22,15 +22,15 @@ All contributions require a [Dojo Foundation CLA](http://dojofoundation.org/abou
 
 _Bower_ release installation:
 
-    $ bower install delite-core
+    $ bower install decor
 
 _Manual_ master installation:
 
-    $ git clone git://github.com/ibm-js/delite-core.git
+    $ git clone git://github.com/ibm-js/decor.git
 
 Then install dependencies with bower (or manually from github if you prefer to):
 
-	$ cd delite-core
+	$ cd decor
 	$ bower install
 
 ## Documentation

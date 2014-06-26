@@ -92,17 +92,17 @@ layer of structure of how repositories can relate to each other.
 Once you have successfully forked your repository, you will need to clone it locally to your machine:
 
 ```bash
-$ git clone git@github.com:username/delite-core.git
+$ git clone git@github.com:username/decor.git
 ```
 
-This will clone your fork to your current path in a directory named `delite-core`.
+This will clone your fork to your current path in a directory named `decor`.
 
 You should also setup the `upstream` repository.  This will allow you to take changes from the "master" repository
 and merge them into your local clone and then push them to your GitHub fork:
 
 ```bash
-$ cd delite-core
-$ git remote add upstream git@github.com:ibm-js/delite-core.git
+$ cd decor
+$ git remote add upstream git@github.com:ibm-js/decor.git
 $ git fetch upstream
 ```
 
