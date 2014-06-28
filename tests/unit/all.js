@@ -1,5 +1,6 @@
 define([
 	"./schedule",
 	"./Observable",
-	"./Stateful"
+	"./Stateful",
+	"./Destroyable"
 ]);

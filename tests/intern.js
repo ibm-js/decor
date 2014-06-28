@@ -62,5 +62,5 @@ define({
 
 	suites: ["decor/tests/unit/all"],
 
-	excludeInstrumentation: /^((decor(\/|\\)(node_modules|tests))|requirejs|dcl)/
+	excludeInstrumentation: /^((decor(\/|\\)(node_modules|tests))|dojo|requirejs|dcl)/
 });
