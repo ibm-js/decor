@@ -1,0 +1,19 @@
+{
+	"name": "decor",
+	"version": "0.0.1-dev",
+	"dependencies": {
+	},
+	"devDependencies": {
+		"intern": "1.7",
+		"grunt": "~0.4.2",
+		"grunt-contrib-jshint": "~0.6.3",
+		"jsdoc-amddcl": "git://github.com/ibm-js/jsdoc-amddcl#master"
+	},
+	"licenses": [
+		{
+			"type": "BSD",
+			"url": "https://github.com/ibm-js/decor/blob/master/LICENSE"
+		}
+	],
+	"bugs": "https://github.com/ibm-js/decor/issues"
+}
