@@ -1,0 +1,5 @@
+define([
+	"./schedule",
+	"./Observable",
+	"./Stateful"
+]);
