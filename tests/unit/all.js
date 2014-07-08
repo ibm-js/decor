@@ -1,8 +1,9 @@
 define([
-	"./schedule",
-	"./Observable",
-	"./Stateful",
-	"./Invalidating",
 	"./Destroyable",
-	"./sniff"
+	"./Evented",
+	"./Invalidating",
+	"./Observable",
+	"./schedule",
+	"./sniff",
+	"./Stateful"
 ]);
