@@ -2,8 +2,11 @@
 	"name": "decor",
 	"version": "0.0.1-dev",
 	"dependencies": {
+		"dcl": "1.1.x",
+		"requirejs": "2.1.x"
 	},
 	"devDependencies": {
+		"dojo": ">=1.10"
 	},
 	"ignore": [
 		".jshintrc",
