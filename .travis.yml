@@ -10,7 +10,7 @@ install:
   - npm install
   - yes | bower install
   - cd node_modules/intern
-  - npm install --production
+  - npm install
   - cd ../..
 script:
   - grunt jshint
