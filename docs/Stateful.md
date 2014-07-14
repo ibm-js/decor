@@ -1,3 +1,8 @@
+---
+layout: default
+title: decor/Stateful
+---
+
 # decor/Stateful
 
 decor/Stateful allows you to define a class with a set of properties,
