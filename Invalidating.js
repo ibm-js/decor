@@ -26,14 +26,14 @@ define([
 			this.own(
 				this._hComputing = this.observe(function (oldValues) {
 					this.computeProperties(oldValues);
-					this.discardComputing();
+					this.deliverComputing();
 				}),
 				this._hRendering = this.observe(function (oldValues) {
 					this.refreshRendering(oldValues);
-					this.discardChanges();
 				})
 			);
-			this.discardChanges(); // Discard changes made by this function itself
+			// Discard changes made by this function itself (to ._hComputing and _hRendering)
+			this.discardChanges();
 		},
 
 		/**

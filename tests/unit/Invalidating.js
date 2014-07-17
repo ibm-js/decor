@@ -22,16 +22,16 @@ define([
 			invalidating.bar = "Bar1";
 			invalidating.foo = "Foo1";
 		},
-		"Computed property": function () {
+		"Property validation": function () {
 			var computePropertiesCallCount = 0,
 				dfd = this.async(1000),
-				invalidating = new (dcl([Invalidating], {
+				invalidating = new (dcl(Invalidating, {
 					foo: undefined,
-					computeProperties: dfd.rejectOnError(function (newValues) {
+					computeProperties: dfd.rejectOnError(function () {
 						if (++computePropertiesCallCount > 1) {
 							throw new Error("computeProperties() should be called only once.");
 						}
-						if (newValues.foo < 0) {
+						if (this.foo < 0) {
 							this.foo = 0;
 							this.discardComputing();
 						}
@@ -43,6 +43,34 @@ define([
 					foo: 1
 				});
 			invalidating.foo = -1;
+		},
+		"Computed property": function () {
+			var computePropertiesCallCount = 0,
+				dfd = this.async(1000),
+				invalidating = new (dcl(Invalidating, {
+					foo: undefined,
+					bar: undefined,
+					baz: undefined,
+					computeProperties: dfd.rejectOnError(function (oldValues) {
+						if ("foo" in oldValues && typeof this.foo === "string") {
+							this.bar = this.foo.replace(/^Foo/, "Bar");
+						}
+						if ("bar" in oldValues && typeof this.bar === "string") {
+							this.baz = this.bar.replace(/^Bar/, "Baz");
+						}
+						if ("baz" in oldValues && typeof this.baz === "string") {
+							this.foo = this.baz.replace(/^Baz/, "Foo");
+						}
+						++computePropertiesCallCount;
+					}),
+					refreshRendering: dfd.callback(function () {
+						assert.strictEqual(computePropertiesCallCount, 3);
+						assert.strictEqual(invalidating.foo, "Foo0");
+						assert.strictEqual(invalidating.bar, "Bar0");
+						assert.strictEqual(invalidating.baz, "Baz0");
+					})
+				}))();
+			invalidating.foo = "Foo0";
 		},
 		"Synchronous change delivery": function () {
 			var finishedMicrotask = false,
