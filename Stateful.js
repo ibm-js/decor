@@ -249,7 +249,7 @@ define([
 
 	dcl.chainAfter(Stateful, "_introspect");
 
-	var REGEXP_SHADOW_PROPS = /^_(.+)Attr$/;
+	var REGEXP_PRIVATE_PROPS = /^_/;
 
 	/**
 	 * An observer to observe all {@link module:decor/Stateful Stateful} properties at once.
@@ -274,8 +274,10 @@ define([
 				if (!this._closed && !this._beingDiscarded) {
 					var oldValues = {};
 					records.forEach(function (record) {
-						if ((!has("object-observe-api") || !REGEXP_SHADOW_PROPS.test(record.name))
-							&& !(record.name in oldValues)) {
+						// Shadow properties are not set up for properties beginning with '_'
+						// Original author of the code has stated that it's not to emit change notifications
+						// for those (private) properties
+						if (!REGEXP_PRIVATE_PROPS.test(record.name) && !(record.name in oldValues)) {
 							oldValues[record.name] = record.oldValue;
 						}
 					});
