@@ -9,7 +9,7 @@ define([
 	 * that want to calculate computed properties at once and/or to render UI at once upon multiple property changes.
 	 * @class module:decor/Invalidating
 	 */
-	return dcl([Stateful, Destroyable], /** @lends module:decor/Invalidating# */ {
+	var Invalidating = dcl([Stateful, Destroyable], /** @lends module:decor/Invalidating# */ {
 		constructor: dcl.after(function () {
 			this._initializeInvalidating();
 		}),
@@ -86,4 +86,9 @@ define([
 		 */
 		refreshRendering: function () {}
 	});
+
+	dcl.chainAfter(Invalidating, "computeProperties");
+	dcl.chainAfter(Invalidating, "refreshRendering");
+
+	return Invalidating;
 });
