@@ -1,27 +1,8 @@
 markdown: redcarpet
 
-baseurl: /deliteful
+baseurl: /decor
 
 pygments: true
 
 redcarpet:
   extensions: ['tables']
-
-paginate: 3
-
-defaults:
-  -
-    scope:
-      path: ""
-    values:
-      layout: "main"
-  -
-    scope:
-      path: "docs"
-    values:
-      layout: "default"
-  -
-    scope:
-      path: "../_posts"
-    values:
-      layout: "post"
