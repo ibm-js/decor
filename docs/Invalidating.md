@@ -5,8 +5,8 @@ title: decor/Invalidating
 
 # decor/Invalidating
 
-`decor/Invalidating` is a base class that adds the ability to observe for a set of properties and
-delay to the next execution frame the refresh following the changes of the values of these properties.
+`decor/Invalidating` is a mixin class to for UI-related Custom Elements
+that want to calculate computed properties at once and/or to render UI at once upon multiple property changes.
 Invalidating extends `decor/Stateful`, and `delite/Widget` extends Invalidating.
 
 For that purpose the class adds two lifecycle phases to the class.
