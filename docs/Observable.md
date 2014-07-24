@@ -33,9 +33,9 @@ In such conditions, you can manually emit a change record (and queue it for deli
 
 ## Synthetic change record
 
-If you make a higher-level change to an object (than of just mutating), such as array splice, having such higher-level change represented directly in a change record will be useful. You can do that by `Observable.getNotifier(observable).performChange(type, callback)` method. The 1st argument (`type`) is the change type you define for your higher-level change. The 2nd argument is a function where you can make a series of changes that your higher-level change represents, and then return your higher-level change.
+If you make a higher-level change to an object (as opposed to a simple property update/delete/add), such as array splice, having such higher-level change represented directly in a change record will be useful. You can do that by `Observable.getNotifier(observable).performChange(type, callback)` method. The first argument (`type`) is the change type you define for your higher-level change. The second argument is a function where you can make a series of changes that your higher-level change represents, and then return your higher-level change.
 
-You can observe your higher-level change by adding the change type of your higher-level change to the 3rd argument of `Observable.observe()`. Otherwise, raw changes to `Observable` (`update`, etc.) will be observed.
+You can observe your higher-level change by adding the change type of your higher-level change to the third argument of `Observable.observe()`. Otherwise, raw changes to `Observable` (`update`, etc.) will be observed.
 
 Here's an example, where `Point#move()` method moves the point with the given distance and direction (`angle`). The code to update `x` and `y` with the result is in `performChange()` callback so that the updates are represented by a change record with `move` type, with the distance and direction (`angle`):
 
