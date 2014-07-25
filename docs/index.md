@@ -16,7 +16,7 @@ The decor project contains some classes and utilities that are not directly rela
 
 * [Destroyable](Destroyable.md) - Base class to track handles and release them when the instance is destroyed.
 * [Evented](Evented.md) - Base class to emit events and let applications easily monitor those events.
-* schedule (TODO)
+* [schedule](schedule.md) - A utility function to schedule a callback at the end of micro-task.
 * [sniff](sniff.md) - Browser sniffing.
 
 ## General information
