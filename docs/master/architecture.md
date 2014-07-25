@@ -32,9 +32,9 @@ The design goals of Stateful were:
 * no performance penalty if many instances of the class are created
 
 Behind the scenes, `Stateful` implements the `observe()` method by extending
-[`decor/Observable`](Observable.md) shim of `Object.observe()`.
+[`decor/Observable`](Observable.html) shim of `Object.observe()`.
 
-But then, [`decor/Stateful`](Stateful.md) notes all the properties defined in the prototype, direct and inherited,
+But then, [`decor/Stateful`](Stateful.html) notes all the properties defined in the prototype, direct and inherited,
 and calls `Object.defineProperty()` on the **prototype** to add native ES5 setters and getters for those properties.
 For properties where the subclass doesn't define a custom setter, Stateful will generate one on-the-fly
 that just calls `this._set(...)` to save the new value and notify `Observable` that the value changed.
