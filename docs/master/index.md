@@ -16,7 +16,7 @@ The decor project contains some classes and utilities that are not directly rela
 
 * [Destroyable](Destroyable.html) - Base class to track handles and release them when the instance is destroyed.
 * [Evented](Evented.html) - Base class to emit events and let applications easily monitor those events.
-* [schedule](schedule.html) - A utility function to schedule a callback at the end of micro-task.
+* [schedule](schedule.html) - A utility function to schedule a callback at the end of [micro-task](http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#microtask).
 * [sniff](sniff.html) - Browser sniffing.
 
 ## General information
