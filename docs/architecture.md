@@ -10,9 +10,13 @@ General notes on decor design goals and architectural decisions.
 ## Observable
 
 [`Observable`](Observable.html) is a "value-holder" object working as a shim of ES7 [`Object.observe()`](http://wiki.ecmascript.org/doku.php?id=harmony:observe).
-A "value-holder" object sometimes requires decoration/undecoration from/to plain object, and triggering observation requires specific way to set a value to object, but such "specific way" ensures the best performance, without needing to go through all observed objects to see what objects are changed at ends of micro-tasks.
+A "value-holder" object sometimes requires decoration/undecoration from/to plain object, and triggering observation requires specific way to set a property on an object,
+but such "specific way" ensures the best performance, without needing to go through all observed objects to see what objects are changed
+at ends of [micro-tasks](http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#microtask).
 
-For triggering observation, [`Stateful`](Stateful.html), a class on top of [`Observable`](Observable.html), decorates declared properties with ES5 accessors. [`Observable`](Observable.html) itself provides `.set(name, value)` method which allows to trigger observation without declaraing properties. Alternatively `Observable.getNotifier(observable).notify(changeRecord)` can be used.
+For triggering observation, [`Stateful`](Stateful.html), a class on top of [`Observable`](Observable.html), decorates declared properties with ES5 accessors.
+[`Observable`](Observable.html) itself provides `.set(name, value)` method which allows to trigger observation without declaraing properties.
+Alternatively `Observable.getNotifier(observable).notify(changeRecord)` can be used.
 
 ### Observable and ES7 Object.observe()
 
