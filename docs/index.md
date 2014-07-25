@@ -14,7 +14,7 @@ The decor project contains some classes and utilities that are not directly rela
 
 ## Other classes
 
-* Destroyable (TODO)
+* [Destroyable](Destroyable.md)
 * Evented (TODO)
 * schedule (TODO)
 * sniff (TODO)
