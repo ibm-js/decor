@@ -11,7 +11,7 @@ Invalidating extends `decor/Stateful`, and `delite/Widget` extends Invalidating.
 
 For that purpose the class adds two lifecycle phases to the class.
 
-The first phase is the refresh properties phase. It is used to reconciliate instances properties after they have been
+The first phase is the refresh properties phase. It is used to reconcile instances properties after they have been
 set. A typical example is making sure the value of a range component is correctly set between min and max values and 
 that the max value is bigger than min value. This phase is optional and not all classes leveraging `decor/Invalidating`
 will need it.
@@ -75,9 +75,11 @@ define(["delite/register", "delite/Widget"/*, ...*/],
 Once setup you don't need anything special to use the invalidating class. You just need to change one of the properties
 and the refresh methods will be called automatically for you.
 
-If for some reason you want to invalidate a particular property without setting it explicitly then you can call `notifyCurrentValue(property)`.
+If for some reason you want to invalidate a particular property without setting it explicitly
+then you can call `notifyCurrentValue(property)`.
 
 In some cases you might want to force the rendering to occur right after a given property has been set. For that you can
 use `deliver()`.
 
-In some cases you might want to avoid rendering from occuring even if a property was changed. For that you can use `discardChanges()`.
+In some cases you might want to avoid rendering from occurring even if a property was changed.
+For that you can use `discardChanges()`.
