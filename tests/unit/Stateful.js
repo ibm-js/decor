@@ -352,6 +352,36 @@ define([
 			stateful.foo = "Foo2";
 			hObserve.deliver();
 			assert.deepEqual(changes, [{foo: "Foo1"}]);
-		}
+		},
+		"observe filter": function () {
+			// Check to make sure reported changes are consistent between platforms with and without Object.observe()
+			// native support
+			var dfd = this.async(1000),
+				stateful = new (dcl(Stateful, {
+					_private: 1,
+
+					foo: 2,
+					_setFooAttr: function (val) {
+						this._set("foo", val);
+					},
+
+					constructor: function () {
+						this.instanceProp = 3;
+					},
+
+					anotherFunc: function () { }
+				}))({});
+			stateful.observe(dfd.callback(function (oldValues) {
+				assert.deepEqual(oldValues, {
+					_private: 1,
+					foo: 2
+				});
+			}));
+			stateful._private = 11;
+			stateful.foo = 22;
+			stateful.anotherFunc = function () { };
+			stateful.instanceProp = 33;
+		},
+
 	});
 });

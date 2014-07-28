@@ -37,6 +37,8 @@ define([
 		});
 	}
 
+	var REGEXP_SHADOW_PROPS = /^_(.+)Attr$/;
+
 	/**
 	 * Base class for objects that provide named properties with optional getter/setter
 	 * control and the ability to observe for property changes.
@@ -72,28 +74,28 @@ define([
 	 */
 	var Stateful = dcl(null, /** @lends module:decor/Stateful# */ {
 		/**
-		 * Returns the list of properties that should be observable.
-		 * @returns {String[]} List of properties.
+		 * Returns a hash of properties that should be observed.
+		 * @returns {Object} Hash of properties.
 		 * @private
 		 */
 		_getProps: function () {
-			var list = [];
+			var hash = {};
 			for (var prop in this) {
-				if (typeof this[prop] !== "function" && !/^_/.test(prop)) {
-					list.push(prop);
+				if (typeof this[prop] !== "function" && !REGEXP_SHADOW_PROPS.test(prop)) {
+					hash[prop] = true;
 				}
 			}
-			return list;
+			return hash;
 		},
 
 		/**
 		 * Sets up ES5 getters/setters for each class property.
 		 * Inside _introspect(), "this" is a reference to the prototype rather than any individual instance.
-		 * @param String[] props
+		 * @param {Object} props - Hash of properties.
 		 * @private
 		 */
 		_introspect: function (props) {
-			props.forEach(function (prop) {
+			Object.keys(props).forEach(function (prop) {
 				var names = propNames(prop),
 					shadowProp = names.p,
 					getter = names.g,
@@ -126,8 +128,9 @@ define([
 				// was already inspected but this class wasn't.
 				var ctor = this.constructor;
 				if (!ctor._introspected) {
-					// note: inside _introspect() this refs prototype
-					ctor.prototype._introspect(ctor.prototype._getProps());
+					// note: inside _getProps() and _introspect(), this refs prototype
+					ctor._props = ctor.prototype._getProps();
+					ctor.prototype._introspect(ctor._props);
 					ctor._introspected = true;
 				}
 				Observable.call(this);
@@ -152,7 +155,7 @@ define([
 
 		/**
 		 * Set a hash of properties on a Stateful instance.
-		 * @param {Object} hash Hash of properties.
+		 * @param {Object} hash - Hash of properties.
 		 * @example
 		 * myObj.mix({
 		 *     foo: "Howdy",
@@ -241,7 +244,7 @@ define([
 		 *     stateful.baz = 10;
 		 */
 		observe: function (callback) {
-			var h = new Stateful.PropertyListObserver(this);
+			var h = new Stateful.PropertyListObserver(this, this.constructor._props);
 			h.open(callback, this);
 			return h;
 		}
@@ -249,16 +252,16 @@ define([
 
 	dcl.chainAfter(Stateful, "_introspect");
 
-	var REGEXP_SHADOW_PROPS = /^_(.+)Attr$/;
-
 	/**
-	 * An observer to observe all {@link module:decor/Stateful Stateful} properties at once.
+	 * An observer to observe a set of {@link module:decor/Stateful Stateful} properties at once.
 	 * This class is what {@link module:decor/Stateful#observe} returns.
 	 * @class module:decor/Stateful.PropertyListObserver
-	 * @property {Object} o The {@link module:decor/Stateful Stateful} being observed.
+	 * @param {Object} o - The {@link module:decor/Stateful Stateful} being observed.
+	 * @param {Object} props - Hash of properties to observe.
 	 */
-	Stateful.PropertyListObserver = function (o) {
+	Stateful.PropertyListObserver = function (o, props) {
 		this.o = o;
+		this.props = props;
 	};
 
 	Stateful.PropertyListObserver.prototype = {
@@ -270,12 +273,14 @@ define([
 		 * @param {Object} thisObject The object that should works as "this" object for callback.
 		 */
 		open: function (callback, thisObject) {
+			var props = this.props;
 			this._boundCallback = function (records) {
 				if (!this._closed && !this._beingDiscarded) {
 					var oldValues = {};
 					records.forEach(function (record) {
-						if ((!has("object-observe-api") || !REGEXP_SHADOW_PROPS.test(record.name))
-							&& !(record.name in oldValues)) {
+						// for consistency with  platforms w/out native Object.observe() support,
+						// only notify about updates to non-function properties in prototype (see _getProps())
+						if (record.name in props && !(record.name in oldValues)) {
 							oldValues[record.name] = record.oldValue;
 						}
 					});
