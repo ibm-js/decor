@@ -3,7 +3,7 @@
 	"version": "0.2.0-beta",
 	"dependencies": {
 		"requirejs": "2.1.x",
-		"requirejs-dplugins": ">=0.2.2-dev",
+		"requirejs-dplugins": "0.2.x",
 		"dcl": "1.1.x"
 	},
 	"devDependencies": {
