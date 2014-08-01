@@ -21,8 +21,6 @@ The second phase is the refresh rendering phase. It is used to refresh the rende
 or through template binding is that for several properties changes the refresh rendering phase will be called only once
 leading to better performance by making sure the rendering is not modified several times in a row
 
-Before proceeding, checkout [setup page](setup.md) on how to setup a project using delite. This will be required to leverage the samples from this page.
-
 ##### Table of Contents
 [Setting Up Invalidating](#setting)
 [Implementing Lifecycle](#implementing)
