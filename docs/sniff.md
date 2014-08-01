@@ -5,8 +5,8 @@ title: decor/sniff
 
 # decor/sniff
 
-You should always try to use feature detection (see general overview
-[Using Capability Detection](http://dev.opera.com/articles/view/using-capability-detection/)
+You should always try to use feature detection (for a general overview, see
+[Feature detection](http://en.wikipedia.org/wiki/Feature_detection_(web_development))
 whenever possible to write forward-compatible code branches.
 The `requirejs-dplugins/has` API is designed to help in this endeavor.
 
