@@ -5,24 +5,22 @@ define([
 	"./Destroyable"
 ], function (dcl, Stateful, Destroyable) {
 	/**
-	 * Mixin class to for widgets
+	 * Mixin class for widgets
 	 * that want to calculate computed properties at once and/or to render UI at once upon multiple property changes.
 	 * @class module:decor/Invalidating
 	 */
 	var Invalidating = dcl([Stateful, Destroyable], /** @lends module:decor/Invalidating# */ {
 		constructor: dcl.after(function () {
-			this._initializeInvalidating();
-		}),
-
-		buildRendering: dcl.after(function () {
-			this._initializeInvalidating();
+			this.initializeInvalidating();
 		}),
 
 		/**
 		 * Sets up observers, one for computed properties, one for UI rendering.
-		 * @private
+		 * Normally this method is called automatically by the constructor, and should not be called manually,
+		 * but the method is exposed for custom elements since they do not call the `constructor()` method.
+		 * @protected
 		 */
-		_initializeInvalidating: function () {
+		initializeInvalidating: function () {
 			this.own(
 				this._hComputing = this.observe(function (oldValues) {
 					this.computeProperties(oldValues);
