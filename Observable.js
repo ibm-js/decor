@@ -380,7 +380,7 @@ define([
 			try {
 				callback(callback._changeRecords.splice(0, length));
 			} catch (e) {
-				has("console") && console.error("Error occured in observer callback: " + (e.stack || e));
+				has("console-api") && console.error("Error occured in observer callback: " + (e.stack || e));
 			}
 			removeGarbageCallback(callback);
 			return length > 0;
