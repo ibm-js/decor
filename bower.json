@@ -1,13 +1,13 @@
 {
 	"name": "decor",
-	"version": "0.3.0-alpha",
+	"version": "0.3.0",
 	"dependencies": {
 		"requirejs": "2.1.x",
 		"requirejs-dplugins": "0.3.x",
 		"dcl": "1.1.x"
 	},
 	"devDependencies": {
-		"dojo": ">=1.9.1"
+		"dojo": ">=1.9.4"
 	},
 	"ignore": [
 		".jshintrc",
