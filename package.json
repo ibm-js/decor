@@ -16,5 +16,6 @@
 			"url": "https://github.com/ibm-js/decor/blob/master/LICENSE"
 		}
 	],
-	"bugs": "https://github.com/ibm-js/decor/issues"
+	"bugs": "https://github.com/ibm-js/decor/issues",
+	"private": true
 }
