@@ -22,10 +22,9 @@ or through template binding is that for several properties changes the refresh r
 leading to better performance by making sure the rendering is not modified several times in a row
 
 ##### Table of Contents
-[Setting Up Invalidating](#setting)
-[Implementing Lifecycle](#implementing)
-[Using Invalidating](#using)
-[Events](#events)
+[Setting Up Invalidating](#setting)  
+[Implementing Lifecycle](#implementing)  
+[Using Invalidating](#using)  
 
 <a name="setting"></a>
 ## Setting up Invalidating
