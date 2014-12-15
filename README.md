@@ -35,4 +35,4 @@ Then install dependencies with bower (or manually from github if you prefer to):
 
 ## Documentation
 
-See the [docs directory](./docs).
+See [here](http://ibm-js.github.io/decor/docs/master/index.html).
