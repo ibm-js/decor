@@ -1,19 +1,17 @@
 define(["./intern"], function (intern) {
-	var config = {
-		environments: [
-			{browserName: "internet explorer"},
-			{browserName: "firefox"},
-			{browserName: "chrome"}
-		],
-
-		useSauceConnect: false
+	intern.tunnel = "NullTunnel";
+	intern.tunnelOptions = {
+		hostname: "localhost",
+		port: 4444
 	};
 
-	for (var key in intern) {
-		if (!(key in config)) {
-			config[key] = intern[key];
-		}
-	}
+	intern.environments = [
+		{ browserName: "firefox" },
+		{ browserName: "chrome" },
+		{ browserName: "internet explorer", requireWindowFocus: "true" }
+	];
 
-	return config;
+	intern.maxConcurrency = 1;
+
+	return intern;
 });
