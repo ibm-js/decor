@@ -2,6 +2,7 @@ env:
   global:
     - secure: "Px8iT5Bw+zbiFdy5sQij7uMtKLMgCP7gHu5tPhnsxwZJ4CP0h7zR7UPlQa3Pa3t1UxAw7z/EQoflz68U56cLrwwgfMfls5aaH4el/rC57tk/AjST9bb2Pmj/TknX3BUiVmcXfaiq+57/CDI94EMZDbhd1p+e9I7bbCHyBnAVOW4="
     - secure: "PBXgLoYtREMx542NX4zVaYBpSoVhkdwLdJbsoP9xejfUiSRwgvpe/Vl1sGH1WtSOfpcmkWOz+cR9ngnvfGYJJXk//UNuQXoxpWs2lzI7Pqip5y/ZOGGh7+aQ64NMOif5h8NyZktn4+8jfe6kt3RNE+7mjo+sqPhq38QgB9lhG84="
+
 language: node_js
 node_js: "0.10"
 install:
@@ -14,5 +15,4 @@ install:
   - cd ../..
 script:
   - grunt jshint
-  - grunt intern:node
-  - if [[ "$TRAVIS_SECURE_ENV_VARS" == "true" ]]; then grunt intern:remote; fi
+  - grunt test:remote
