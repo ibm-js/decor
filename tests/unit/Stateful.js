@@ -328,14 +328,19 @@ define([
 		"notifyCurrentValue()": function () {
 			var dfd = this.async(1000),
 				stateful = new (dcl(Stateful, {
-					foo: undefined
+					foo: undefined,
+					bar: undefined,
+					zaz: undefined
 				}))({
-					foo: "Foo"
+					foo: "Foo",
+					bar: "Bar",
+					zaz: "Zaz"
 				});
 			stateful.observe(dfd.callback(function (oldValues) {
-				assert.deepEqual(oldValues, {foo: "Foo"});
+				assert.deepEqual(oldValues, {foo: "Foo", bar: "Bar", zaz: "Zaz"});
 			}));
-			stateful.notifyCurrentValue("foo");
+			stateful.notifyCurrentValue("foo", "bar");
+			stateful.notifyCurrentValue("zaz");
 		},
 		"Stateful.PropertyListObserver#deliver(), Stateful.PropertyListObserver#discardChanges()": function () {
 			var changes = [],

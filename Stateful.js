@@ -204,13 +204,15 @@ define([
 		},
 
 		/**
-		 * Notify current value to observers.
+		 * Notify current values to observers for specified property name(s).
 		 * Handy to manually schedule invocation of observer callbacks when there is no change in value.
 		 * @method module:decor/Stateful#notifyCurrentValue
-		 * @param {string} name The property name.
+		 * @param {...string} name The property name.
 		 */
-		notifyCurrentValue: function (name) {
-			notify(this, name, this[propNames(name).p]);
+		notifyCurrentValue: function () {
+			Array.prototype.forEach.call(arguments, function (name) {
+				notify(this, name, this[propNames(name).p]);
+			}, this);
 		},
 
 		/**
