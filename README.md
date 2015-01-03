@@ -16,8 +16,6 @@ Bugs and open issues are tracked in the
 This project is distributed by the Dojo Foundation and licensed under the ["New" BSD License](./LICENSE).
 All contributions require a [Dojo Foundation CLA](http://dojofoundation.org/about/claForm).
 
-## Dependencies
-
 ## Installation
 
 _Bower_ release installation:
@@ -28,7 +26,7 @@ _Manual_ master installation:
 
     $ git clone git://github.com/ibm-js/decor.git
 
-Then install dependencies with bower (or manually from github if you prefer to):
+Then install dependencies with bower (or manually from github if you prefer):
 
 	$ cd decor
 	$ bower install
