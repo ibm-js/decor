@@ -19,20 +19,13 @@ define(["./features"], function (has) {
 			dav = n.appVersion,
 			tv = parseFloat(dav);
 
-		var isWebkit = parseFloat(dua.split("WebKit/")[1]) || undefined;
-		if (isWebkit) {
-			has.add("webkit", parseFloat(dua.split("WebKit/")[1]) || undefined);
+		// Browser detection
+		var webkit = parseFloat(dua.split("WebKit/")[1]) || undefined;
+		if (webkit) {
+			has.add("webkit", webkit);
 			has.add("chrome", parseFloat(dua.split("Chrome/")[1]) || undefined);
 			has.add("safari", dav.indexOf("Safari") >= 0 && !has("chrome") ?
 				parseFloat(dav.split("Version/")[1]) : undefined);
-			if (dua.match(/(iPhone|iPod|iPad)/)) {
-				var p = RegExp.$1.replace(/P/, "p");
-				var v = dua.match(/OS ([\d_]+)/) ? RegExp.$1 : "1";
-				var os = parseFloat(v.replace(/_/, ".").replace(/_/g, ""));
-				has.add(p, os);		// "iphone", "ipad" or "ipod"
-				has.add("ios", os);
-			}
-			has.add("android", parseFloat(dua.split("Android ")[1]) || undefined);
 		} else {
 			var isIE = 0;
 			if (document.all) {
@@ -62,7 +55,16 @@ define(["./features"], function (has) {
 			}
 		}
 
+		// Platform detection
 		has.add("mac", dav.indexOf("Macintosh") >= 0);
+		if (dua.match(/(iPhone|iPod|iPad)/)) {
+			var p = RegExp.$1.replace(/P/, "p");
+			var v = dua.match(/OS ([\d_]+)/) ? RegExp.$1 : "1";
+			var os = parseFloat(v.replace(/_/, ".").replace(/_/g, ""));
+			has.add(p, os);		// "iphone", "ipad" or "ipod"
+			has.add("ios", os);
+		}
+		has.add("android", parseFloat(dua.split("Android ")[1]) || undefined);
 
 		has.add("msapp", parseFloat(dua.split("MSAppHost/")[1]) || undefined);
 	}
