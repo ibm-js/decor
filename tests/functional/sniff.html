@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<title>decor/sniff test</title>
+		<style>
+			table {
+				border-collapse: collapse;
+			}
+			td {
+				padding: 2px;
+				border:  1px solid black;
+			}
+		</style>
+		<script src="../../../requirejs/require.js"></script>
+		<script>
+			require({
+				baseUrl: "../../.."
+			}, ["decor/sniff", "requirejs-domready/domReady!"], function(has){
+				["webkit", "chrome", "safari", "ie", "mozilla", "ff", "ios", "android", "msapp"].forEach(
+						function (key) {
+					var res = has(key);
+					tbody.innerHTML += "<tr><td>has(\"" + key + "\")</td><td>" +
+						(res === undefined ? "undefined" : res) + "</td></tr>";
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>decor/sniff results</h1>
+		<table>
+			<tbody id="tbody">
+			</tbody>
+		</table>
+	</body>
+</html>
