@@ -6,6 +6,7 @@
  * - `has("ie")`
  * - `has("ios")`
  * - `has("android")`
+ * - `had("wp")
  *
  * It returns the `has()` function.
  * @module decor/sniff
