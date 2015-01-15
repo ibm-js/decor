@@ -69,10 +69,7 @@ define(["./features"], function (has) {
 
 		has.add("msapp", parseFloat(dua.split("MSAppHost/")[1]) || undefined);
 
-		var wp = parseFloat(dua.split("Windows Phone ")[1]) || undefined;
-		if (wp) {
-			has.add("wp", wp);
-		}
+		has.add("wp", parseFloat(dua.split("Windows Phone ")[1]) || undefined);
 	}
 
 	return has;

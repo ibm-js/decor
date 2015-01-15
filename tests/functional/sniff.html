@@ -15,7 +15,7 @@
 			require({
 				baseUrl: "../../.."
 			}, ["decor/sniff", "requirejs-domready/domReady!"], function(has){
-				["webkit", "chrome", "safari", "ie", "mozilla", "ff", "ios", "android", "msapp"].forEach(
+				["webkit", "chrome", "safari", "ie", "mozilla", "ff", "ios", "android", "wp", "msapp"].forEach(
 						function (key) {
 					var res = has(key);
 					tbody.innerHTML += "<tr><td>has(\"" + key + "\")</td><td>" +
