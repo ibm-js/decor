@@ -6,6 +6,7 @@
  * - `has("ie")`
  * - `has("ios")`
  * - `has("android")`
+ * - `had("wp")
  *
  * It returns the `has()` function.
  * @module decor/sniff
@@ -67,6 +68,8 @@ define(["./features"], function (has) {
 		has.add("android", parseFloat(dua.split("Android ")[1]) || undefined);
 
 		has.add("msapp", parseFloat(dua.split("MSAppHost/")[1]) || undefined);
+
+		has.add("wp", parseFloat(dua.split("Windows Phone ")[1]) || undefined);
 	}
 
 	return has;

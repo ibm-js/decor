@@ -22,10 +22,11 @@ The sniff module defines the following has-features:
 * `has("mozilla")` - mozilla based browser
 * `has("webkit")` - webkit based browser
 * `has("ff")` - firefox
-* `has("safari")` - safari (either on mac desktop or iOS)
+* `has("safari")` - safari (either on Mac desktop or iOS)
 * `has("chrome")` - chrome
-* `has("ios")` - truthy for iPhone, iPad, etc.
-* `has("android")` - true for android devices
+* `has("ios")` - truthy for iOS devices (iPhone, iPad, etc.)
+* `has("android")` - truthy for Android devices
+* `has("wp")` - truthy for Windows Phone devices
 * `has("mac")` - true for mac desktop
 * `has("msapp")` - app is running in Microsoft's container for stand alone web apps (similar to cordova).
 
@@ -34,22 +35,22 @@ The return value is only defined if the specified browser is being used.
 For example, if you're using Internet Explorer, only `has("ie")` is defined;
 all the other `has()` calls return undefined.
 
-`Has()` returns the browser version number as a number, so you can easily perform version checks.
+`has()` returns the browser version number as a number, so you can easily perform version checks.
 Additionally, since undefined always results in a false result in greater-than or less-than comparisons,
 you can use code like this to check for a certain browser version:
 
 
 ```js
-require(["decor/sniff"], function(has){
-	if(has("ie") <= 9){ // only IE9 and below
+require(["decor/sniff"], function(has) {
+	if (has("ie") <= 9) { // only IE9 and below
 	  ...
 	}
 
-	if(has("ff") < 24){ // only Firefox 24 and lower
+	if (has("ff") < 24) { // only Firefox 24 and lower
 	  ...
 	}
 
-	if(has("ie") == 10){ // only IE10
+	if (has("ie") == 10) { // only IE10
 	  ...
 	}
 });
