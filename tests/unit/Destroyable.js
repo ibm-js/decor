@@ -3,11 +3,11 @@ define([
 	"intern/chai!assert",
 	"dcl/advise",
 	"dcl/dcl",
+	"lie/dist/lie",
 	"decor/Destroyable",
-	"dojo/Deferred",
 	"decor/Stateful",
 	"decor/features"
-], function (registerSuite, assert, advise, dcl, Destroyable, Deferred, Stateful, has) {
+], function (registerSuite, assert, advise, dcl, Promise, Destroyable, Stateful, has) {
 	var container;
 
 	function on(node, type, callback) {
@@ -171,45 +171,45 @@ define([
 		},
 
 		owningPromises: function () {
-			var cancels = 0;
+			var cancels = [];
+
+			// own() can only handle Promises w/additional destroy() or cancel() method.
+			function Deferred() {
+				var p = new Promise(function (resolve, reject) {
+					this.res = resolve;
+					this.cancel = reject;
+				}.bind(this));
+				this.then = p.then;
+			}
 			var W1 = dcl(Destroyable, {
 				constructor: function () {
-					this.p1 = new Deferred(function () {
-						cancels++;
-					});
-					this.p2 = new Deferred(function () {
-						cancels++;
-					});
-					this.p3 = new Deferred(function () {
-						cancels++;
-					});
-					this.p4 = new Deferred(function () {
-						cancels++;
-					});
-					this.own(this.p1, this.p2, this.p3, this.p4);
+					this.p1 = new Deferred();
+					this.p2 = new Deferred();
+					this.p3 = new Deferred();
+					this.own(this.p1, this.p2, this.p3);
 				}
 			});
 
 			var w1 = new W1();
 
-			w1.p1.resolve(true);
-			advise.after(w1.p1, "cancel", function () {
-				throw new Error("p1 shouldn't have been canceled");
+			w1.p1.res(true);
+			w1.p2.cancel();
+			Promise.all(w1.p1, w1.p2).then(function () {
+				advise.after(w1.p1, "cancel", function () {
+					cancels.push("p1");
+				});
+				advise.after(w1.p2, "cancel", function () {
+					cancels.push("p2");
+				});
+				advise.after(w1.p3, "cancel", function () {
+					cancels.push("p31");
+				});
+				w1.destroy();
+
+				return new Promise(function (resolve) { setTimeout(resolve, 100); });
+			}).then(function () {
+				assert.deepEqual(cancels, ["p3"], "only p3 canceled on widget destroy");
 			});
-
-			w1.p2.reject(new Error("I was rejected"));
-			advise.after(w1.p2, "cancel", function () {
-				throw new Error("p2 shouldn't have been canceled");
-			});
-
-			w1.p3.cancel();
-			assert.strictEqual(cancels, 1, "one promise canceled manually before destroy");
-
-			// Destroying the widget should only cancel p4; it's the only Promise that hasn't been dealt with already.
-			// OTOH if Destroyable is broken, one of the asserts above may go off during the destroy() call.
-			w1.destroy();
-
-			assert.strictEqual(cancels, 2, "only p4 canceled on widget destroy");
 		},
 
 		teardown: function () {

@@ -2,12 +2,12 @@
 	"name": "decor",
 	"version": "0.4.0",
 	"dependencies": {
+		"dcl": "1.1.x",
+		"lie": ">=2.8",
 		"requirejs": "2.1.x",
-		"requirejs-dplugins": "0.4.x",
-		"dcl": "1.1.x"
+		"requirejs-dplugins": "0.4.x"
 	},
 	"devDependencies": {
-		"dojo": ">=1.9.4",
 		"requirejs-domready": "2.0.x"
 	},
 	"ignore": [

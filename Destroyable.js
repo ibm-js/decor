@@ -19,11 +19,15 @@ define([
 		destroy: dcl.advise({
 			before: function () {
 				this._beingDestroyed = true;
+				this._releaseHandles();
 			},
 			after: function () {
 				this._destroyed = true;
 			}
 		}),
+
+		_releaseHandles: function () {
+		},
 
 		/**
 		 * Track specified handles and remove/destroy them when this instance is destroyed, unless they were
@@ -35,7 +39,8 @@ define([
 		own: function () {
 			var cleanupMethods = [
 				"destroy",
-				"remove"
+				"remove",
+				"cancel"
 			];
 
 			// transform arguments into an Array
@@ -46,7 +51,7 @@ define([
 				// this.inherited() or even if it doesn't call this.inherited() at all.  If that's an issue, make an
 				// onDestroy() method and connect to that instead.
 				var destroyMethodName;
-				var odh = advise.before(this, "destroy", function () {
+				var odh = advise.after(this, "_releaseHandles", function () {
 					handle[destroyMethodName]();
 				});
 
@@ -61,24 +66,23 @@ define([
 				}
 
 				// Setup listeners for manual destroy of handle.
-				// Also computes destroyMethodName, used in listener above.
+				// Also compute destroyMethodName, used in listener above.
 				if (handle.then) {
-					// Special path for Promises.  Detect when Promise is resolved, rejected, or
-					// canceled (nb: cancelling a Promise causes it to be rejected).
-					destroyMethodName = "cancel";
+					// Special path for Promises.  Detect when Promise is fulfilled.
 					handle.then(onManualDestroy, onManualDestroy);
-				} else {
-					// Path for other handles.  Just use AOP to detect when handle is manually destroyed.
-					cleanupMethods.forEach(function (cleanupMethod) {
-						if (typeof handle[cleanupMethod] === "function") {
-							if (!destroyMethodName) {
-								// Use first matching method name in above listener.
-								destroyMethodName = cleanupMethod;
-							}
+				}
+				cleanupMethods.forEach(function (cleanupMethod) {
+					if (typeof handle[cleanupMethod] === "function") {
+						if (!destroyMethodName) {
+							// Use first matching method name in above listener.
+							destroyMethodName = cleanupMethod;
+						}
+						if (!handle.then) {
+							// Path for non-promises.  Use AOP to detect when handle is manually destroyed.
 							hdhs.push(advise.after(handle, cleanupMethod, onManualDestroy));
 						}
-					});
-				}
+					}
+				});
 			}, this);
 
 			return ary;

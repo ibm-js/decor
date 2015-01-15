@@ -8,7 +8,6 @@
 	"curly": true,
 	"debug": false,
 	"devel": true,
-	"dojo": false,
 	"eqeqeq": true,
 	"eqnull": true,
 	"es3": false,
