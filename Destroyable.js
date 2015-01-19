@@ -68,7 +68,7 @@ define([
 				// Setup listeners for manual destroy of handle.
 				// Also compute destroyMethodName, used in listener above.
 				if (handle.then) {
-					// Special path for Promises.  Detect when Promise is fulfilled.
+					// Special path for Promises.  Detect when Promise is settled.
 					handle.then(onManualDestroy, onManualDestroy);
 				}
 				cleanupMethods.forEach(function (cleanupMethod) {
