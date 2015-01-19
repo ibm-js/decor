@@ -1,5 +1,8 @@
 <html>
 	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<title>decor/sniff test</title>
 		<style>
 			table {
@@ -12,15 +15,34 @@
 		</style>
 		<script src="../../../requirejs/require.js"></script>
 		<script>
+			var ready = false, // set to true when the test page is ready
+				_has = {};
 			require({
 				baseUrl: "../../.."
 			}, ["decor/sniff", "requirejs-domready/domReady!"], function(has){
-				["webkit", "chrome", "safari", "ie", "mozilla", "ff", "ios", "android", "wp", "msapp"].forEach(
-						function (key) {
-					var res = has(key);
-					tbody.innerHTML += "<tr><td>has(\"" + key + "\")</td><td>" +
-						(res === undefined ? "undefined" : res) + "</td></tr>";
-				});
+				var tbody = document.getElementById("tbody");
+
+
+				var browsers = [
+					"webkit", "chrome", "android",
+					"ie",  "msapp", "wp",
+					"mozilla", "ff",
+					"safari", "iphone", "ipad", "mac", "ios"
+				];
+				for (var i = 0, n = browsers.length; i < n; i++) {
+					var key = browsers[i];
+					_has[key] = has(key);
+					var tr = document.createElement("tr"),
+						tdkey = document.createElement("td"),
+						tdres = document.createElement("td");
+
+					tdkey.innerHTML = 'has("' + key + '")';
+					tdres.innerHTML = _has[key] === undefined ? "undefined" : _has[key];
+					tr.appendChild(tdkey);
+					tr.appendChild(tdres);
+					tbody.appendChild(tr);		
+				}
+				ready = true;
 			});
 		</script>
 	</head>
