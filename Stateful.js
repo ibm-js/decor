@@ -25,7 +25,7 @@ define([
 	}
 
 	/**
-	 * Utility function for notification
+	 * Utility function for notification.
 	 */
 	function notify(stateful, name, oldValue) {
 		Observable.getNotifier(stateful).notify({
@@ -173,7 +173,7 @@ define([
 		/**
 		 * Internal helper for directly setting a property value without calling the custom setter.
 		 *
-		 * Directly change the value of an attribute on an object, bypassing any
+		 * Directly changes the value of an attribute on an object, bypassing any
 		 * accessor setter.  Also notifies callbacks registered via observe().
 		 * Custom setters should call `_set` to actually record the new value.
 		 * @param {string} name - The property to set.
@@ -192,7 +192,7 @@ define([
 		/**
 		 * Internal helper for directly accessing an attribute value.
 		 *
-		 * Directly get the value of an attribute on an object, bypassing any accessor getter.
+		 * Directly gets the value of an attribute on an object, bypassing any accessor getter.
 		 * It is designed to be used by descendant class if they want
 		 * to access the value in their custom getter before returning it.
 		 * @param {string} name - Name of property.
@@ -204,7 +204,7 @@ define([
 		},
 
 		/**
-		 * Notify current values to observers for specified property name(s).
+		 * Notifies current values to observers for specified property name(s).
 		 * Handy to manually schedule invocation of observer callbacks when there is no change in value.
 		 * @method module:decor/Stateful#notifyCurrentValue
 		 * @param {...string} name The property name.
@@ -216,10 +216,10 @@ define([
 		},
 
 		/**
-		 * Observe for change in properties.
+		 * Observes for change in properties.
 		 * Callback is called at the end of micro-task of changes with a hash table of
 		 * old values keyed by changed property.
-		 * Multiple changes to a property in a micro-task is squashed .
+		 * Multiple changes to a property in a micro-task are squashed.
 		 * @method module:decor/Stateful#observe
 		 * @param {function} callback The callback.
 		 * @returns {module:decor/Stateful.PropertyListObserver}
@@ -272,7 +272,7 @@ define([
 		 * {@link module:decor/Stateful#observe `Stateful#observe()`} calls this method automatically.
 		 * @method module:decor/Stateful.PropertyListObserver#open
 		 * @param {function} callback The change callback.
-		 * @param {Object} thisObject The object that should works as "this" object for callback.
+		 * @param {Object} thisObject The object that should work as "this" object for callback.
 		 */
 		open: function (callback, thisObject) {
 			var props = this.props;
@@ -280,7 +280,7 @@ define([
 				if (!this._closed && !this._beingDiscarded) {
 					var oldValues = {};
 					records.forEach(function (record) {
-						// for consistency with  platforms w/out native Object.observe() support,
+						// for consistency with platforms w/out native Object.observe() support,
 						// only notify about updates to non-function properties in prototype (see _getProps())
 						if (record.name in props && !(record.name in oldValues)) {
 							oldValues[record.name] = record.oldValue;
