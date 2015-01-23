@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: doc
 title: decor/Observable - A shim of ES7 Object.observe() by value-holder object
 ---
 

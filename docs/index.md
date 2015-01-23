@@ -1,5 +1,5 @@
 ---
-layout: doc
+layout: docMain
 ---
 
 The decor project contains some classes and utilities that are not directly related to UI.
