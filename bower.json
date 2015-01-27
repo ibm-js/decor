@@ -3,9 +3,8 @@
 	"version": "0.4.0",
 	"dependencies": {
 		"dcl": "1.1.x",
-		"lie": ">=2.8",
 		"requirejs": "2.1.x",
-		"requirejs-dplugins": "0.4.x"
+		"requirejs-dplugins": "0.5.x"
 	},
 	"devDependencies": {
 		"requirejs-domready": "2.0.x"

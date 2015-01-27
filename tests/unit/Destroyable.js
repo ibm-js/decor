@@ -3,7 +3,7 @@ define([
 	"intern/chai!assert",
 	"dcl/advise",
 	"dcl/dcl",
-	"lie/dist/lie",
+	"requirejs-dplugins/Promise!",
 	"decor/Destroyable",
 	"decor/Stateful",
 	"decor/features"
@@ -179,7 +179,7 @@ define([
 					this.res = resolve;
 					this.cancel = reject;
 				}.bind(this));
-				this.then = p.then;
+				this.then = p.then.bind(p);
 			}
 			var W1 = dcl(Destroyable, {
 				constructor: function () {
