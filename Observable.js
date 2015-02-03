@@ -122,8 +122,12 @@ define([
 	 * @returns {Object} The target object.
 	 */
 	Observable.assign = function (dst) {
+		if (dst == null) {
+			throw new TypeError("Can't convert " + dst + " to object.");
+		}
+		dst = Object(dst);
 		for (var hasDstSetter = typeof dst.set === "function", i = 1, l = arguments.length; i < l; ++i) {
-			var src = arguments[i],
+			var src = Object(arguments[i]),
 				props = Object.getOwnPropertyNames(src);
 			for (var j = 0, m = props.length; j < m; ++j) {
 				var prop = props[j];

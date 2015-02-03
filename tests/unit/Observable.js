@@ -541,9 +541,9 @@ define([
 					foo: "Foo",
 					bar: "Bar"
 				},
-				src1 = {
-					baz: "Baz"
-				};
+				src1 = Object.create({ignore: "Ignore"}, {
+					baz: {enumerable: true, writable: true, configurable: true, value: "Baz"}
+				});
 			handles.push(Observable.observe(dst, dfd.callback(function (records) {
 				assert.deepEqual(records, [
 					{
@@ -563,7 +563,31 @@ define([
 					}
 				]);
 			})));
-			Observable.assign(dst, src0, src1);
+			var s,
+				merged = {},
+				result = Observable.assign(dst, src0, src1);
+			for (s in src0) {
+				merged[s] = src0[s];
+			}
+			for (s in src1) {
+				if (src1.hasOwnProperty(s)) {
+					merged[s] = src1[s];
+				}
+			}
+			assert.deepEqual(dst, merged);
+			assert.strictEqual(dst, result);
+		},
+		"Assign to plain object": function () {
+			var dst = {},
+				src0 = {
+					foo: "Foo"
+				},
+				src1 = {
+					bar: "Bar",
+					baz: "Baz"
+				},
+				result = Observable.assign(dst, src0, src1);
+			assert.strictEqual(result, dst);
 			var s,
 				merged = {};
 			for (s in src0) {
@@ -574,25 +598,41 @@ define([
 			}
 			assert.deepEqual(dst, merged);
 		},
-		"Assign to plain object": function () {
-			var dst = {},
+		"Assign to primitive": function () {
+			var dst = 0,
 				src0 = {
 					foo: "Foo"
 				},
 				src1 = {
 					bar: "Bar",
 					baz: "Baz"
-				};
-			Observable.assign(dst, src0, src1);
+				},
+				result = Observable.assign(dst, src0, src1);
 			var s,
-				merged = {};
+				merged = Object(dst);
 			for (s in src0) {
 				merged[s] = src0[s];
 			}
 			for (s in src1) {
 				merged[s] = src1[s];
 			}
-			assert.deepEqual(dst, merged);
+			assert.deepEqual(result, merged);
+		},
+		"Assign to undefined/null": function () {
+			var caughtForUndefined,
+				caughtForNull;
+			try {
+				Observable.assign(undefined, {});
+			} catch (e) {
+				caughtForUndefined = true;
+			}
+			try {
+				Observable.assign(null, {});
+			} catch (e) {
+				caughtForNull = true;
+			}
+			assert.isTrue(caughtForUndefined);
+			assert.isTrue(caughtForNull);
 		}
 		// TODO(asudoh): Add more enumerable/configuable/writable tests
 		// TODO(asudoh): Add test for Observable.observe() is called twice for the same observable/callback pair,

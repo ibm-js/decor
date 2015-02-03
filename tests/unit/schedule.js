@@ -5,7 +5,7 @@ define([
 ], function (registerSuite, assert, schedule) {
 	var handles = [];
 	registerSuite({
-		name: "Observable",
+		name: "schedule",
 		afterEach: function () {
 			for (var handle = null; (handle = handles.shift());) {
 				handle.remove();
