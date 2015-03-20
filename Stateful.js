@@ -76,9 +76,9 @@ define([
 		/**
 		 * Returns a hash of properties that should be observed.
 		 * @returns {Object} Hash of properties.
-		 * @private
+		 * @protected
 		 */
-		_getProps: function () {
+		getProps: function () {
 			var hash = {};
 			for (var prop in this) {
 				if (typeof this[prop] !== "function" && !REGEXP_SHADOW_PROPS.test(prop)) {
@@ -90,11 +90,11 @@ define([
 
 		/**
 		 * Sets up ES5 getters/setters for each class property.
-		 * Inside _introspect(), "this" is a reference to the prototype rather than any individual instance.
+		 * Inside introspect(), "this" is a reference to the prototype rather than any individual instance.
 		 * @param {Object} props - Hash of properties.
-		 * @private
+		 * @protected
 		 */
-		_introspect: function (props) {
+		introspect: function (props) {
 			Object.keys(props).forEach(function (prop) {
 				var names = propNames(prop),
 					shadowProp = names.p,
@@ -128,9 +128,9 @@ define([
 				// was already inspected but this class wasn't.
 				var ctor = this.constructor;
 				if (!ctor._introspected) {
-					// note: inside _getProps() and _introspect(), this refs prototype
-					ctor._props = ctor.prototype._getProps();
-					ctor.prototype._introspect(ctor._props);
+					// note: inside getProps() and introspect(), this refs prototype
+					ctor._props = ctor.prototype.getProps();
+					ctor.prototype.introspect(ctor._props);
 					ctor._introspected = true;
 				}
 				Observable.call(this);
@@ -252,7 +252,7 @@ define([
 		}
 	});
 
-	dcl.chainAfter(Stateful, "_introspect");
+	dcl.chainAfter(Stateful, "introspect");
 
 	/**
 	 * An observer to observe a set of {@link module:decor/Stateful Stateful} properties at once.
@@ -281,7 +281,7 @@ define([
 					var oldValues = {};
 					records.forEach(function (record) {
 						// for consistency with platforms w/out native Object.observe() support,
-						// only notify about updates to non-function properties in prototype (see _getProps())
+						// only notify about updates to non-function properties in prototype (see getProps())
 						if (record.name in props && !(record.name in oldValues)) {
 							oldValues[record.name] = record.oldValue;
 						}
