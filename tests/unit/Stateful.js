@@ -358,6 +358,35 @@ define([
 			hObserve.deliver();
 			assert.deepEqual(changes, [{foo: "Foo1"}]);
 		},
+		"Stateful#deliver(), Stateful#discardChanges()": function () {
+			var stateful = new (dcl(Stateful, {
+				foo: undefined,
+				bar: undefined
+			}))({
+				foo: "Foo0",
+				bar: "Bar0"
+			});
+			var log = "";
+			stateful.observe(function () {
+				log += "first";
+			});
+			stateful.observe(function () {
+				log += ", second";
+			});
+			stateful.foo = "Foo1";
+			stateful.bar = "Bar1";
+			stateful.deliver();
+			assert.strictEqual(log, "first, second", "deliver()");
+
+			log = "";
+			stateful.foo = "Foo2";
+			stateful.bar = "Bar2";
+			stateful.discardChanges();
+			stateful.deliver();
+			setTimeout(this.async().callback(function () {
+				assert.strictEqual(log, "", "discardChanges()");
+			}), 10);
+		},
 		"observe filter": function () {
 			// Check to make sure reported changes are consistent between platforms with and without Object.observe()
 			// native support
@@ -386,7 +415,6 @@ define([
 			stateful.foo = 22;
 			stateful.anotherFunc = function () { };
 			stateful.instanceProp = 33;
-		},
-
+		}
 	});
 });

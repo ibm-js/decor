@@ -52,25 +52,6 @@ define([
 		},
 
 		/**
-		 * Synchronously deliver change records for computed properties and then UI rendering
-		 * so that `refreshingRendering()` is called if there are pending change records.
-		 */
-		deliver: function () {
-			this._hComputing && this._hComputing.deliver();
-			this._hRendering && this._hRendering.deliver();
-			return this._hComputing;
-		},
-
-		/**
-		 * Discard change records.
-		 */
-		discardChanges: function () {
-			this._hComputing && this._hComputing.discardChanges();
-			this._hRendering && this._hRendering.discardChanges();
-			return this._hComputing;
-		},
-
-		/**
 		 * Callback function to calculate computed properties upon property changes.
 		 * @param {Object} newValues The hash table of new property values, keyed by property names.
 		 * @param {Object} oldValues The hash table of old property values, keyed by property names.

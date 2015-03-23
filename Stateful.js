@@ -1,9 +1,10 @@
 /** @module decor/Stateful */
 define([
+	"dcl/advise",
 	"dcl/dcl",
 	"./features",
 	"./Observable"
-], function (dcl, has, Observable) {
+], function (advise, dcl, has, Observable) {
 	var apn = {};
 
 	/**
@@ -216,6 +217,15 @@ define([
 		},
 
 		/**
+		 * Get list of properties that Stateful#observe() should observe.
+		 * @returns {string[]} list of properties
+		 * @protected
+		 */
+		getPropsToObserve: function () {
+			return this.constructor._props;
+		},
+
+		/**
 		 * Observes for change in properties.
 		 * Callback is called at the end of micro-task of changes with a hash table of
 		 * old values keyed by changed property.
@@ -246,9 +256,31 @@ define([
 		 *     stateful.baz = 10;
 		 */
 		observe: function (callback) {
-			var h = new Stateful.PropertyListObserver(this, this.constructor._props);
+			// create new listener
+			var h = new Stateful.PropertyListObserver(this, this.getPropsToObserve());
 			h.open(callback, this);
+
+			// make this.deliver() and this.discardComputing() call deliver() and discardComputing() on new listener
+			var a1 = advise.after(this, "deliver", h.deliver.bind(h)),
+				a2 = advise.after(this, "discardChanges", h.discardChanges.bind(h));
+			advise.before(h, "close", function () {
+				a1.unadvise();
+				a2.unadvise();
+			});
+
 			return h;
+		},
+
+		/**
+		 * Synchronously deliver change records to all listeners registered via `observe()`.
+		 */
+		deliver: function () {
+		},
+
+		/**
+		 * Discard change records for all listeners registered via `observe()`.
+		 */
+		discardChanges: function () {
 		}
 	});
 
