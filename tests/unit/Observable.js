@@ -578,15 +578,35 @@ define([
 			assert.strictEqual(dst, result);
 		},
 		"Assign to plain object": function () {
-			var dst = {},
+			var dfd = this.async(1000),
+				dst = {},
 				src0 = {
 					foo: "Foo"
 				},
 				src1 = {
 					bar: "Bar",
 					baz: "Baz"
-				},
-				result = Observable.assign(dst, src0, src1);
+				};
+			handles.push(Observable.observe(dst, dfd.callback(function (records) {
+				assert.deepEqual(records, [
+					{
+						type: "add",
+						object: dst,
+						name: "foo"
+					},
+					{
+						type: "add",
+						object: dst,
+						name: "bar"
+					},
+					{
+						type: "add",
+						object: dst,
+						name: "baz"
+					}
+				]);
+			})));
+			var result = Observable.assign(dst, src0, src1);
 			assert.strictEqual(result, dst);
 			var s,
 				merged = {};
@@ -619,20 +639,12 @@ define([
 			assert.deepEqual(result, merged);
 		},
 		"Assign to undefined/null": function () {
-			var caughtForUndefined,
-				caughtForNull;
-			try {
+			assert.throws(function () {
 				Observable.assign(undefined, {});
-			} catch (e) {
-				caughtForUndefined = true;
-			}
-			try {
+			});
+			assert.throws(function () {
 				Observable.assign(null, {});
-			} catch (e) {
-				caughtForNull = true;
-			}
-			assert.isTrue(caughtForUndefined);
-			assert.isTrue(caughtForNull);
+			});
 		}
 		// TODO(asudoh): Add more enumerable/configuable/writable tests
 		// TODO(asudoh): Add test for Observable.observe() is called twice for the same observable/callback pair,
