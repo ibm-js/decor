@@ -14,7 +14,8 @@ module.exports = function (grunt) {
 			node: {
 				options: {
 					runType: "client",
-					config: "tests/intern"
+					config: "tests/intern",
+					reporters: ["console"]
 				}
 			},
 			local: {
