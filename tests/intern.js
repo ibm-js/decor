@@ -54,7 +54,7 @@ define({
 	},
 
 	useLoader: {
-		"host-node": "requirejs",
+		"host-node": "dojo/dojo", // Dojo inside Intern, for node.js testing
 		"host-browser": "../../../requirejs/require.js"
 	},
 
