@@ -30,7 +30,7 @@ define(["./features"], function (has) {
 	if (has("mutation-observer-api")) {
 		pseudoDiv.id = 0;
 		new MutationObserver(runCallbacks).observe(pseudoDiv, {attributes: true});
-	} else if (!has("setimmediate-api")) {
+	} else if (!has("setimmediate-api") && has("host-browser")) {
 		window.addEventListener("message", function (event) {
 			if (event.data === uniqueId) {
 				runCallbacks();
