@@ -314,6 +314,34 @@ define([
 			})));
 			observable.set("foo", "Foo0");
 		},
+		"Synchronous change delivery": function () {
+			var cumulatedRecords = [],
+				observable0 = new Observable(),
+				observable1 = new Observable(),
+				callback = function (records) {
+					cumulatedRecords.push.apply(cumulatedRecords, records);
+				};
+			handles.push(Observable.observe(observable0, callback, ["update"]));
+			handles.push(Observable.observe(observable1, callback, ["add"]));
+			observable0.set("foo", "Foo0");
+			observable0.set("foo", "Foo1");
+			observable1.set("foo", "Foo0");
+			observable1.set("foo", "Foo1");
+			assert.isUndefined(Observable.deliverChangeRecords(callback));
+			assert.deepEqual(cumulatedRecords, [
+				{
+					type: "update",
+					object: observable0,
+					name: "foo",
+					oldValue: "Foo0"
+				},
+				{
+					type: "add",
+					object: observable1,
+					name: "foo"
+				}
+			]);
+		},
 		"Synthetic change record": function () {
 			var dfd = this.async(1000),
 				observable = new Observable({0: 0, 1: 1, length: 2});

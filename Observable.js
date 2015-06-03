@@ -387,7 +387,6 @@ define([
 				has("console-api") && console.error("Error occured in observer callback: " + (e.stack || e));
 			}
 			removeGarbageCallback(callback);
-			return length > 0;
 		};
 	}
 
