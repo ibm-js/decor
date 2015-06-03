@@ -1,7 +1,7 @@
 /** @module liaison/ObservableArray */
 define([
 	"requirejs-dplugins/has",
-	"decor/Observable"
+	"./Observable"
 ], function (has, Observable) {
 	"use strict";
 

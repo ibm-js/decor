@@ -3,6 +3,7 @@ define([
 	"./Evented",
 	"./Invalidating",
 	"./Observable",
+	"./ObservableArray",
 	"./schedule",
 	"./sniff",
 	"./Stateful"
