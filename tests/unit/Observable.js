@@ -554,12 +554,12 @@ define([
 			})));
 			observable0.set("foo0", "Foo1");
 			observable1.set("foo1", "Foo1");
-			h1.remove();
+			assert.isUndefined(h1.remove());
 			h1 = null;
 			observable1.set("bar1", "Bar1");
 			observable0.set("bar0", "Bar0");
-			h0.remove();
-			h0.remove(); // Make sure removing the handle twice won't cause any problem
+			assert.isUndefined(h0.remove());
+			assert.isUndefined(h0.remove()); // Make sure removing the handle twice won't cause any problem
 			h0 = null;
 		},
 		"Assign to Observable": function () {

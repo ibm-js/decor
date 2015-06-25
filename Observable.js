@@ -163,7 +163,9 @@ define([
 		Observable.observe = function (object, callback, accept) {
 			Object.observe.call(this, object, callback, accept);
 			return {
-				remove: Object.unobserve.bind(Object, object, callback)
+				remove: function () {
+					Object.unobserve(object, callback);
+				}
 			};
 		};
 
