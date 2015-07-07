@@ -1,6 +1,6 @@
 {
 	"name": "decor",
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"dependencies": {},
 	"devDependencies": {
 		"jshint": "~2.5.1",
