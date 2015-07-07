@@ -17,12 +17,11 @@ define([
 		var uc = name.replace(/^[a-z]|-[a-zA-Z]/g, function (c) {
 			return c.charAt(c.length - 1).toUpperCase();
 		});
-		var ret = apn[name] = {
-			p: "_" + name + "Attr",		// shadow property, since real property hidden by setter/getter
+		return apn[name] = {
+			p: "_shadow" + uc + "Attr",	// shadow property, since real property hidden by setter/getter
 			s: "_set" + uc + "Attr",	// converts dashes to camel case, ex: accept-charset --> _setAcceptCharsetAttr
 			g: "_get" + uc + "Attr"
 		};
-		return ret;
 	}
 
 	/**
@@ -38,7 +37,7 @@ define([
 		});
 	}
 
-	var REGEXP_SHADOW_PROPS = /^_(.+)Attr$/;
+	var REGEXP_IGNORE_PROPS = /^constructor$|^_set$|^_get$|^deliver$|^discardChanges$|^_(.+)Attr$/;
 
 	/**
 	 * Base class for objects that provide named properties with optional getter/setter
@@ -82,7 +81,7 @@ define([
 		getProps: function () {
 			var hash = {};
 			for (var prop in this) {
-				if (typeof this[prop] !== "function" && !REGEXP_SHADOW_PROPS.test(prop)) {
+				if (!REGEXP_IGNORE_PROPS.test(prop)) {
 					hash[prop] = true;
 				}
 			}

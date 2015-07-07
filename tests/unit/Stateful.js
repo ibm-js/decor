@@ -13,7 +13,7 @@ define([
 				baz: "",
 
 				_getFooAttr: function () {
-					return this._fooAttr - 1;
+					return this._get("foo") - 1;
 				},
 
 				_setBarAttr: function (value) {
@@ -391,6 +391,7 @@ define([
 			// Check to make sure reported changes are consistent between platforms with and without Object.observe()
 			// native support
 			var dfd = this.async(1000),
+				nop = function () {},
 				stateful = new (dcl(Stateful, {
 					_private: 1,
 
@@ -403,12 +404,13 @@ define([
 						this.instanceProp = 3;
 					},
 
-					anotherFunc: function () { }
+					anotherFunc: nop
 				}))({});
 			stateful.observe(dfd.callback(function (oldValues) {
 				assert.deepEqual(oldValues, {
 					_private: 1,
-					foo: 2
+					foo: 2,
+					anotherFunc: nop
 				});
 			}));
 			stateful._private = 11;
