@@ -17,11 +17,12 @@ define([
 		var uc = name.replace(/^[a-z]|-[a-zA-Z]/g, function (c) {
 			return c.charAt(c.length - 1).toUpperCase();
 		});
-		return apn[name] = {
+		var ret = apn[name] = {
 			p: "_shadow" + uc + "Attr",	// shadow property, since real property hidden by setter/getter
 			s: "_set" + uc + "Attr",	// converts dashes to camel case, ex: accept-charset --> _setAcceptCharsetAttr
 			g: "_get" + uc + "Attr"
 		};
+		return ret;
 	}
 
 	/**
