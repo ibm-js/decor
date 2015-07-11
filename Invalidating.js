@@ -36,7 +36,7 @@ define([
 
 		/**
 		 * Synchronously deliver change records for computed properties
-		 * so that `refreshingComputing()` is called if there are pending change records.
+		 * so that `computeProperties()` is called if there are pending change records.
 		 */
 		deliverComputing: function () {
 			this._hComputing && this._hComputing.deliver();
@@ -49,6 +49,23 @@ define([
 		discardComputing: function () {
 			this._hComputing && this._hComputing.discardChanges();
 			return this._hComputing;
+		},
+
+		/**
+		 * Synchronously deliver change records to render UI changes
+		 * so that `refreshingRendering()` is called if there are pending change records.
+		 */
+		deliverRendering: function () {
+			this._hRendering && this._hRendering.deliver();
+			return this._hRendering;
+		},
+
+		/**
+		 * Discard change records to render UI changes.
+		 */
+		discardRendering: function () {
+			this._hRendering && this._hRendering.discardChanges();
+			return this._hRendering;
 		},
 
 		/**
