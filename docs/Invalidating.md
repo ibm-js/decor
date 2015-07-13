@@ -43,18 +43,17 @@ parameter a hash object which contains the name of the properties that have trig
 particularly useful when several properties are involved.
 
 ```js
-define(["delite/register", "delite/Widget"/*, ...*/],
-  function (register, Widget/*, ...*/) {
-  return register("my-widget", [HTMElement, Widget], {
+define(["dcl/dcl", "decor/Invalidating"/*, ...*/], function (dcl, Invalidating/*, ...*/) {
+  return dcl(Invalidating, {
     a: true,
     b: "value",
-    computeProperties (oldValues) {
+    computeProperties: function (oldValues) {
       if ("a" in oldValues) {
         // do something logical that does not directly impact the DOM because "a" has changed
         // To access new value, access directly to `this.a`
       }
     },
-    refreshRendering (oldValues) {
+    refreshRendering: function (oldValues) {
       if ("b" in oldValues) {
         // modify the DOM because "b" has changed
         // To access new value, access directly to `this.b`
