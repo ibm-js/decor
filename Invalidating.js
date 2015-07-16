@@ -27,7 +27,11 @@ define([
 					this.deliverComputing();
 				}),
 				this._hRendering = this.observe(function (oldValues) {
-					this.refreshRendering(oldValues);
+					var shouldInitializeRendering = this.shouldInitializeRendering(oldValues);
+					if (shouldInitializeRendering) {
+						this.initializeRendering(oldValues);
+					}
+					this.refreshRendering(oldValues, shouldInitializeRendering);
 				})
 			);
 			// Discard changes made by this function itself (to ._hComputing and _hRendering)
@@ -69,16 +73,29 @@ define([
 		},
 
 		/**
+		 * Function to return if rendering should be initialized.
+		 * (Instead of making partial changes for post-initialization)
+		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
+		 * @return {boolean} True if rendering should be initialized.
+		 */
+		shouldInitializeRendering: function () {},
+
+		/**
 		 * Callback function to calculate computed properties upon property changes.
-		 * @param {Object} newValues The hash table of new property values, keyed by property names.
 		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
 		 */
 		computeProperties: function () {},
 
 		/**
-		 * Callback function to render UI upon property changes.
-		 * @param {Object} newValues The hash table of new property values, keyed by property names.
+		 * Callback function to initialize rendering.
 		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
+		 */
+		initializeRendering: function () {},
+
+		/**
+		 * Callback function to render UI upon property changes.
+		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
+		 * @param {boolean} isAfterInitialRendering True if this call is right after `initializeRendering()`.
 		 */
 		refreshRendering: function () {}
 	});
