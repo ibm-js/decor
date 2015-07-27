@@ -21,21 +21,29 @@ define([
 		 * @protected
 		 */
 		initializeInvalidating: function () {
-			this.own(
-				this._hComputing = this.observe(function (oldValues) {
-					this.computeProperties(oldValues);
-					this.deliverComputing();
-				}),
-				this._hRendering = this.observe(function (oldValues) {
-					var shouldInitializeRendering = this.shouldInitializeRendering(oldValues);
-					if (shouldInitializeRendering) {
-						this.initializeRendering(oldValues);
-					}
-					this.refreshRendering(oldValues, shouldInitializeRendering);
-				})
-			);
-			// Discard changes made by this function itself (to ._hComputing and _hRendering)
-			this.discardChanges();
+			if (!this._hComputing && !this._hRendering) {
+				this.computeProperties(this, true);
+				var shouldInitializeRendering = this.shouldInitializeRendering(this, true);
+				if (shouldInitializeRendering) {
+					this.initializeRendering(this);
+				}
+				this.refreshRendering(this, shouldInitializeRendering);
+				this.own(
+					this._hComputing = this.observe(function (oldValues) {
+						this.computeProperties(oldValues);
+						this.deliverComputing();
+					}),
+					this._hRendering = this.observe(function (oldValues) {
+						var shouldInitializeRendering = this.shouldInitializeRendering(oldValues);
+						if (shouldInitializeRendering) {
+							this.initializeRendering(oldValues);
+						}
+						this.refreshRendering(oldValues, shouldInitializeRendering);
+					})
+				);
+				// Discard changes made by this function itself (to ._hComputing and _hRendering)
+				this.discardChanges();
+			}
 		},
 
 		/**
@@ -76,6 +84,7 @@ define([
 		 * Function to return if rendering should be initialized.
 		 * (Instead of making partial changes for post-initialization)
 		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
+		 * @param {boolean} isAfterCreation True if this call is right after instantiation.
 		 * @return {boolean} True if rendering should be initialized.
 		 */
 		shouldInitializeRendering: function () {},
@@ -83,6 +92,7 @@ define([
 		/**
 		 * Callback function to calculate computed properties upon property changes.
 		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
+		 * @param {boolean} isAfterCreation True if this call is right after instantiation.
 		 */
 		computeProperties: function () {},
 
