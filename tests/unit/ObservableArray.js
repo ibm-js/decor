@@ -2,7 +2,7 @@ define([
 	"intern!bdd",
 	"intern/chai!expect",
 	"../../Observable",
-	"delite/features",
+	"../../features",
 	"../../ObservableArray"
 ], function (bdd, expect, Observable, has, ObservableArray) {
 	/* jshint withstmt: true */

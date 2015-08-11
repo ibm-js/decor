@@ -131,5 +131,3 @@ Here is the list of the APIs you can use to explicitly emit change records:
   * `#splice()`
   * `#reverse()`
   * `#sort()`
-* [`ObservablePath`](http://ibm-js.github.io/liaison/docs/master/BindingSource.html)
-  * `#setValue()` (New in post-0.1.5)
