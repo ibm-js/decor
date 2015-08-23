@@ -4,6 +4,7 @@ env:
     - secure: "PBXgLoYtREMx542NX4zVaYBpSoVhkdwLdJbsoP9xejfUiSRwgvpe/Vl1sGH1WtSOfpcmkWOz+cR9ngnvfGYJJXk//UNuQXoxpWs2lzI7Pqip5y/ZOGGh7+aQ64NMOif5h8NyZktn4+8jfe6kt3RNE+7mjo+sqPhq38QgB9lhG84="
 language: node_js
 node_js: "0.10"
+sudo: false
 install:
   - npm -g install bower
   - npm -g install grunt-cli
