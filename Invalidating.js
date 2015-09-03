@@ -1,17 +1,26 @@
 /** @module decor/Invalidating */
 define([
 	"dcl/dcl",
-	"./schedule",
 	"./Stateful",
 	"./Destroyable"
-], function (dcl, schedule, Stateful, Destroyable) {
+], function (dcl, Stateful, Destroyable) {
 	/**
 	 * Mixin class for widgets
 	 * that want to calculate computed properties at once and/or to render UI at once upon multiple property changes.
 	 * @class module:decor/Invalidating
 	 */
 	var Invalidating = dcl([Stateful, Destroyable], /** @lends module:decor/Invalidating# */ {
-		_initializeInvalidating: function () {
+		constructor: dcl.after(function () {
+			this.initializeInvalidating();
+		}),
+
+		/**
+		 * Sets up observers, one for computed properties, one for UI rendering.
+		 * Normally this method is called automatically by the constructor, and should not be called manually,
+		 * but the method is exposed for custom elements since they do not call the `constructor()` method.
+		 * @protected
+		 */
+		initializeInvalidating: function () {
 			if (!this._hComputing && !this._hRendering) {
 				this.computeProperties(this, true);
 				var shouldInitializeRendering = this.shouldInitializeRendering(this, true);
@@ -36,35 +45,6 @@ define([
 				this.discardChanges();
 			}
 		},
-
-		constructor: dcl.after(function () {
-			this.initializeInvalidating();
-		}),
-
-		/**
-		 * Sets up observers, one for computed properties, one for UI rendering.
-		 * Normally this method is called automatically by the constructor, and should not be called manually,
-		 * but the method is exposed for custom elements since they do not call the `constructor()` method.
-		 * @protected
-		 */
-		initializeInvalidating: function () {
-			if (!this._hInitializeInvalidating) {
-				this._hInitializeInvalidating = schedule(this._initializeInvalidating.bind(this));
-			}
-		},
-
-		/**
-		 * Synchronously deliver pending change records.
-		 * If there is pending observer setup, do that in addition.
-		 */
-		deliver: dcl.after(function () {
-			if (this._hInitializeInvalidating) {
-				this._initializeInvalidating();
-				this._hInitializeInvalidating.remove();
-				delete this._hInitializeInvalidating;
-				this.discardChanges();
-			}
-		}),
 
 		/**
 		 * Synchronously deliver change records for computed properties
