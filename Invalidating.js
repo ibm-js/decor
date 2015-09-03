@@ -10,12 +10,16 @@ define([
 	 * @class module:decor/Invalidating
 	 */
 	var Invalidating = dcl([Stateful, Destroyable], /** @lends module:decor/Invalidating# */ {
+		// Call initializeInvalidating() right after class is constructed.  Note though that this code won't run for
+		// custom elements, since they call createdCallback() rather than constructor().
+		// Instead, delite/Widget calls initializeInvalidating() directly.
 		constructor: dcl.after(function () {
 			this.initializeInvalidating();
 		}),
 
 		/**
-		 * Sets up observers, one for computed properties, one for UI rendering.
+		 * Make initial calls to `computeProperties()`, `initializeRendering()`, and `refreshRendering()`,
+		 * and setup observers so those methods are called whenever properties are modified in the future.
 		 * Normally this method is called automatically by the constructor, and should not be called manually,
 		 * but the method is exposed for custom elements since they do not call the `constructor()` method.
 		 * @protected
@@ -23,11 +27,8 @@ define([
 		initializeInvalidating: function () {
 			if (!this._hComputing && !this._hRendering) {
 				this.computeProperties(this, true);
-				var shouldInitializeRendering = this.shouldInitializeRendering(this, true);
-				if (shouldInitializeRendering) {
-					this.initializeRendering(this);
-				}
-				this.refreshRendering(this, shouldInitializeRendering);
+				this.initializeRendering(this);
+				this.refreshRendering(this, true);
 				this.own(
 					this._hComputing = this.observe(function (oldValues) {
 						this.computeProperties(oldValues);
@@ -37,8 +38,10 @@ define([
 						var shouldInitializeRendering = this.shouldInitializeRendering(oldValues);
 						if (shouldInitializeRendering) {
 							this.initializeRendering(oldValues);
+							this.refreshRendering(this, true);
+						} else {
+							this.refreshRendering(oldValues);
 						}
-						this.refreshRendering(oldValues, shouldInitializeRendering);
 					})
 				);
 				// Discard changes made by this function itself (to ._hComputing and _hRendering)
