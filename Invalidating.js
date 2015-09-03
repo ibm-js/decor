@@ -26,24 +26,29 @@ define([
 		 */
 		initializeInvalidating: function () {
 			if (!this._hComputing && !this._hRendering) {
+				// Make initial call to computeProperties() and setup listener for future calls to computeProperties().
+				// Any call to computeProperties(), including the initial call, may trigger more immediate calls to
+				// computeProperties().
+				this.own(this._hComputing = this.observe(function (oldValues) {
+					this.computeProperties(oldValues);
+					this.deliverComputing();
+				}));
 				this.computeProperties(this, true);
+
+				// Make initial call to initializeRendering() and refreshRendering(), and setup listener for future
+				// calls.
 				this.initializeRendering(this);
 				this.refreshRendering(this, true);
-				this.own(
-					this._hComputing = this.observe(function (oldValues) {
-						this.computeProperties(oldValues);
-						this.deliverComputing();
-					}),
-					this._hRendering = this.observe(function (oldValues) {
-						var shouldInitializeRendering = this.shouldInitializeRendering(oldValues);
-						if (shouldInitializeRendering) {
-							this.initializeRendering(oldValues);
-							this.refreshRendering(this, true);
-						} else {
-							this.refreshRendering(oldValues);
-						}
-					})
-				);
+				this.own(this._hRendering = this.observe(function (oldValues) {
+					var shouldInitializeRendering = this.shouldInitializeRendering(oldValues);
+					if (shouldInitializeRendering) {
+						this.initializeRendering(oldValues);
+						this.refreshRendering(this, true);
+					} else {
+						this.refreshRendering(oldValues);
+					}
+				}));
+
 				// Discard changes made by this function itself (to ._hComputing and _hRendering)
 				this.discardChanges();
 			}
