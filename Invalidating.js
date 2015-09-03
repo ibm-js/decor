@@ -48,9 +48,6 @@ define([
 						this.refreshRendering(oldValues);
 					}
 				}));
-
-				// Discard changes made by this function itself (to ._hComputing and _hRendering)
-				this.discardChanges();
 			}
 		},
 
