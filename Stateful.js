@@ -313,7 +313,7 @@ define([
 					var oldValues = {};
 					records.forEach(function (record) {
 						// for consistency with platforms w/out native Object.observe() support,
-						// only notify about updates to non-function properties in prototype (see getProps())
+						// only notify about updates to properties in prototype (see getProps())
 						if (record.name in props && !(record.name in oldValues)) {
 							oldValues[record.name] = record.oldValue;
 						}
