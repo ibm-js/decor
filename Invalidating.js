@@ -72,23 +72,6 @@ define([
 		},
 
 		/**
-		 * Synchronously deliver change records to render UI changes
-		 * so that `refreshingRendering()` is called if there are pending change records.
-		 */
-		deliverRendering: function () {
-			this._hRendering && this._hRendering.deliver();
-			return this._hRendering;
-		},
-
-		/**
-		 * Discard change records to render UI changes.
-		 */
-		discardRendering: function () {
-			this._hRendering && this._hRendering.discardChanges();
-			return this._hRendering;
-		},
-
-		/**
 		 * Function to return if rendering should be initialized.
 		 * (Instead of making partial changes for post-initialization)
 		 * @param {Object} oldValues The hash table of old property values, keyed by property names.
