@@ -5,6 +5,9 @@ define(["./intern"], function (intern) {
 		port: 4444
 	};
 
+	// Uncomment this line (and modify machine name) for testing against VM.
+	// intern.proxyUrl = "http://mac.local:9000";
+
 	intern.environments = [
 		{ browserName: "firefox" },
 		{ browserName: "chrome" },
