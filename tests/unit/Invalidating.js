@@ -12,13 +12,13 @@ define([
 				invalidating = new (dcl(Invalidating, {
 					foo: undefined,
 					bar: undefined,
-					computeProperties: function(oldValues){
+					computeProperties: function (oldValues) {
 						log.push({method: "computeProperties", oldValues: oldValues});
 					},
-					initializeRendering: function(){
+					initializeRendering: function () {
 						log.push({method: "initializeRendering"});
 					},
-					refreshRendering: function(oldValues){
+					refreshRendering: function (oldValues) {
 						log.push({method: "refreshRendering", oldValues: oldValues});
 					}
 				}))({
@@ -47,14 +47,13 @@ define([
 			}), 5);
 		},
 		"Property validation": function () {
-			var computePropertiesCallCount = 0,
-				dfd = this.async(1000),
+			var dfd = this.async(1000),
 				cpLog = [], rrLog = [],
 				invalidating = new (dcl(Invalidating, {
 					foo: undefined,
 					computeProperties: function (oldValues) {
 						cpLog.push(oldValues);
-						if(this.foo < 0){
+						if (this.foo < 0) {
 							this.foo = 0;
 							this.discardComputing();
 						}
@@ -117,12 +116,12 @@ define([
 			}), 5);
 		},
 		"Synchronous change delivery": function () {
-			var cpLog = [], rrLog = [],
+			var rrLog = [],
 				invalidating = new (dcl(Invalidating, {
 					foo: undefined,
 					bar: undefined,
-					computeProperties: function (oldValues) {
-						if (this.foo === "Foo1"){
+					computeProperties: function () {
+						if (this.foo === "Foo1") {
 							this.bar = "Bar1";
 							this.deliver();
 						}
@@ -167,17 +166,17 @@ define([
 					foo: undefined,
 					bar: undefined,
 					template: undefined,
-					computeProperties: function(oldValues){
+					computeProperties: function () {
 						log.push("computeProperties");
 					},
 					shouldInitializeRendering: function (oldValues) {
 						log.push("shouldInitializeRendering");
 						return "template" in oldValues;
 					},
-					initializeRendering: function(){
+					initializeRendering: function () {
 						log.push("initializeRendering");
 					},
-					refreshRendering: function(oldValues){
+					refreshRendering: function () {
 						log.push("refreshRendering");
 					}
 				}))({
