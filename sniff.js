@@ -48,10 +48,8 @@ define(["./features"], function (has) {
 		} else if (/Trident/.test(dav)) {
 			// IE8+
 			has.add("ie", document.documentMode || parseFloat(dav.split("rv:")[1]));
-		} else if (/Gecko/.test(dua)) {
-			// Mozilla and firefox
-			has.add("mozilla", tv);
-			has.add("ff", parseFloat(dua.split("Firefox/")[1] || dua.split("Minefield/")[1]) || undefined);
+		} else if ((version = parseFloat(dua.split("Firefox/")[1]))) {
+			has.add("ff", version);
 		}
 	}
 
