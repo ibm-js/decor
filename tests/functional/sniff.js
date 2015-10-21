@@ -32,13 +32,15 @@ define(["intern",
 					var browserName = remote.environmentType.browserName,
 						platform = remote.environmentType.platform,
 						deviceName = remote.environmentType.deviceName;
-
 					switch (browserName) {
 					case "chrome":
 						shouldDetectOnly(["chrome", "webkit"]);
 						break;
 					case "internet explorer":
 						shouldDetectOnly(["ie"]);
+						break;
+					case "microsoftedge":	// TODO: Check actual value of browserName once Intern supports Edge.
+						shouldDetectOnly(["edge"]);
 						break;
 					case "firefox":
 						shouldDetectOnly(["ff", "mozilla"]);
@@ -64,6 +66,6 @@ define(["intern",
 					}
 				})
 				.end();
-		},
+		}
 	});
 });

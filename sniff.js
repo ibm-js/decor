@@ -22,7 +22,7 @@ define(["./features"], function (has) {
 
 
 		// Platform detection
-		has.add("mac", dav.indexOf("Macintosh") >= 0);
+		has.add("mac", /Macintosh/.test(dav));
 		if (dua.match(/(iPhone|iPod|iPad)/)) {
 			var p = RegExp.$1.replace(/P/, "p");
 			var v = dua.match(/OS ([\d_]+)/) ? RegExp.$1 : "1";
@@ -37,16 +37,18 @@ define(["./features"], function (has) {
 		has.add("wp", parseFloat(dua.split("Windows Phone ")[1]) || undefined);
 
 		// Browser detection
-		var webkit = parseFloat(dua.split("WebKit/")[1]) || undefined;
-		if (webkit) {
-			has.add("webkit", webkit);
+		var version;
+		if ((version = parseFloat(dua.split("Edge/")[1]))) {
+			has.add("edge", version);
+		} else if ((version = parseFloat(dua.split("WebKit/")[1]))) {
+			has.add("webkit", version);
 			has.add("chrome", parseFloat(dua.split("Chrome/")[1]) || undefined);
-			has.add("safari", dav.indexOf("Safari") >= 0 && !has("chrome") && !has("android") ?
-				parseFloat(dav.split("Version/")[1]) : undefined);
-		} else if (dav.indexOf("Trident") >= 0) {
+			has.add("safari", /Safari/.test(dav) && !has("chrome") && !has("android") ?
+					parseFloat(dav.split("Version/")[1]) : undefined);
+		} else if (/Trident/.test(dav)) {
 			// IE8+
 			has.add("ie", document.documentMode || parseFloat(dav.split("rv:")[1]));
-		} else if (dua.indexOf("Gecko") >= 0) {
+		} else if (/Gecko/.test(dua)) {
 			// Mozilla and firefox
 			has.add("mozilla", tv);
 			has.add("ff", parseFloat(dua.split("Firefox/")[1] || dua.split("Minefield/")[1]) || undefined);

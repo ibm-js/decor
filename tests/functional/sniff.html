@@ -23,15 +23,12 @@
 			}, ["decor/sniff", "requirejs-domready/domReady!"], function(has){
 				var tbody = document.getElementById("tbody");
 
-
-				var browsers = [
+				[
 					"webkit", "chrome", "android",
-					"ie",  "msapp", "wp",
+					"ie",  "edge", "msapp", "wp",
 					"mozilla", "ff",
 					"safari", "iphone", "ipad", "mac", "ios"
-				];
-				for (var i = 0, n = browsers.length; i < n; i++) {
-					var key = browsers[i];
+				].forEach(function (key) {
 					_has[key] = has(key);
 					var tr = document.createElement("tr"),
 						tdkey = document.createElement("td"),
@@ -42,7 +39,7 @@
 					tr.appendChild(tdkey);
 					tr.appendChild(tdres);
 					tbody.appendChild(tr);
-				}
+				});
 				ready = true;
 			});
 		</script>
