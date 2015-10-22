@@ -17,9 +17,7 @@ define(["./features"], function (has) {
 	if (has("host-browser")) {
 		var n = navigator,
 			dua = n.userAgent,
-			dav = n.appVersion,
-			tv = parseFloat(dav);
-
+			dav = n.appVersion;
 
 		// Platform detection
 		has.add("mac", /Macintosh/.test(dav));
