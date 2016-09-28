@@ -18,8 +18,8 @@ code paths for specific browsers.
 
 The sniff module defines the following has-features:
 
+* `has("edge")` - successor to internet explorer
 * `has("ie")` - internet explorer; note that unlike dojo, `has("ie")` is truthy for IE11
-* `has("mozilla")` - mozilla based browser
 * `has("webkit")` - webkit based browser
 * `has("ff")` - firefox
 * `has("safari")` - safari (either on Mac desktop or iOS)

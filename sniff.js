@@ -1,12 +1,13 @@
 /**
- * This module sets has() flags based on the current browser:
+ * This module sets has() flags based on the current browser and platform:
  *
  * - `has("webkit")`, `has("chrome")`, `has("safari")`
- * - `has("mozilla")`, `has("ff")`
- * - `has("ie")`
+ * - `has("ff")`
+ * - `has("ie")`, `has("edge")`
  * - `has("ios")`
  * - `has("android")`
  * - `has("wp")`
+ * - `has("mac")`
  *
  * It returns the `has()` function.
  * @module decor/sniff
