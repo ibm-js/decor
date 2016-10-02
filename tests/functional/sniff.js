@@ -11,7 +11,6 @@ define(["intern",
 		setup: function () {},
 
 		"Checking browser and platform sniffing": function () {
-			this.timeout = intern.config.TEST_TIMEOUT;
 			var remote = this.remote;
 			return remote
 				.get(require.toUrl(PAGE))
