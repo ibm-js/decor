@@ -2,6 +2,7 @@ define([
 	"./Destroyable",
 	"./Evented",
 	"./Invalidating",
+	"./observe",
 	"./Observable",
 	"./ObservableArray",
 	"./schedule",
