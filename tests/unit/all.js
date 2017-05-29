@@ -1,4 +1,5 @@
 define([
+	"./bind",
 	"./Destroyable",
 	"./Evented",
 	"./Invalidating",
