@@ -1,4 +1,4 @@
-/** @module liaison/ObservableArray */
+/** @module decor/ObservableArray */
 define([
 	"requirejs-dplugins/has",
 	"./Observable"
@@ -7,14 +7,14 @@ define([
 
 	/**
 	 * The same argument list of Array, taking the length of the new array or the initial list of array elements.
-	 * @typedef {number|...Anything} module:liaison/ObservableArray~CtorArguments
+	 * @typedef {number|...Anything} module:decor/ObservableArray~CtorArguments
 	 */
 
 	/**
 	 * An observable array, working as a shim
 	 * of {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
 	 * @class
-	 * @alias module:liaison/ObservableArray
+	 * @alias module:decor/ObservableArray
 	 * @augments module:decor/Observable
 	 * @param {module:decor/ObservableArray~CtorArguments} [args]
 	 *     The length of the new array or the initial list of array elements.
@@ -77,9 +77,9 @@ define([
 		}
 
 		/**
-		 * @method module:liaison/ObservableArray.test
+		 * @method module:decor/ObservableArray.test
 		 * @param {Array} a The array to test.
-		 * @returns {boolean} true if o is an instance of {@link module:liaison/ObservableArray ObservableArray}.
+		 * @returns {boolean} true if o is an instance of {@link module:decor/ObservableArray ObservableArray}.
 		 */
 		ObservableArray.test = function (a) {
 			return a && a[observableArrayMarker];
@@ -87,10 +87,10 @@ define([
 	})();
 
 	/**
-	 * @method module:liaison/ObservableArray.canObserve
+	 * @method module:decor/ObservableArray.canObserve
 	 * @param {Array} a The array to test.
 	 * @returns {boolean}
-	 *     true if o can be observed with {@link module:liaison/ObservableArray.observe ObservableArray.observe()}.
+	 *     true if o can be observed with {@link module:decor/ObservableArray.observe ObservableArray.observe()}.
 	 */
 	if (has("object-observe-api")) {
 		ObservableArray.canObserve = function (a) {
@@ -110,7 +110,7 @@ define([
 			 * @param {number} removeCount [An integer indicating the number of old array elements to remove.
 			 * @param {...Anything} [var_args] The elements to add to the array.
 			 * @return {Array} An array containing the removed elements.
-			 * @memberof module:liaison/ObservableArray#
+			 * @memberof module:decor/ObservableArray#
 			 */
 			function splice(index, removeCount) {
 				/* jshint validthis: true */
@@ -138,7 +138,7 @@ define([
 				return result;
 			}
 
-			augmentedMethods = /** @lends module:liaison/ObservableArray# */ {
+			augmentedMethods = /** @lends module:decor/ObservableArray# */ {
 				splice: splice,
 
 				/**
@@ -268,7 +268,7 @@ define([
 	 * All change records will be converted to "splice" and are sorted by index and merged to smaller number
 	 * of change records.
 	 * @method
-	 * @param {Object} observable The {@link module:liaison/ObservableArray ObservableArray} to observe.
+	 * @param {Object} observable The {@link module:decor/ObservableArray ObservableArray} to observe.
 	 * @param {module:decor/Observable~ChangeCallback} callback The change callback.
 	 * @returns {Handle} The handle to stop observing.
 	 * @throws {TypeError} If the 1st argument is non-object or null.

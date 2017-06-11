@@ -82,7 +82,7 @@ Under the hood, `ObservableArray.observe()` uses ES7 [`Array.observe()`](http://
 
 With `ObservableArray.observe()`, change records are translated to a synthetic version representing array splice where applicable. It makes `ObservableArray.observe()` compatible to ES7 [`Array.observe()`](http://wiki.ecmascript.org/doku.php?id=harmony:observe) except the following conditions:
 
-* Any of splices are adjacent or intersect; `ObservableArray.observe()` attemps to merge them. If makes what liaison or your applicatoin do with the callback, e.g. DOM updates, more efficient.
+* Any of splices are adjacent or intersect; `ObservableArray.observe()` attempts to merge them. It makes what liaison or your application do with the callback, e.g. DOM updates, more efficient.
 * Result of `ObserableArray#reverse()`; [`Array.observe()`](http://wiki.ecmascript.org/doku.php?id=harmony:observe) emits "update" type of change records for array entries.
 * Result of `ObserableArray#sort()`; [`Array.observe()`](http://wiki.ecmascript.org/doku.php?id=harmony:observe) emits "update" type of change records for array entries.
 
@@ -98,8 +98,8 @@ To do that, `ObservableArray.observe()` calls `Array.observe()` or `Observable.o
 
 # Explicit way of emitting change records
 
-liaison takes an approach where you make an explicit API call to emit change records of an object or an array for observation.
-With this approach, the underlying system doesn't need to do a heavylifting to compare old/new values of all object properties observed in your application, which becomes non-trivial for bigger-scale applications.
+Observable takes an approach where you make an explicit API call to emit change records of an object or an array for observation.
+With this approach, the underlying system doesn't need to do a heavy lifting to compare old/new values of all object properties observed in your application, which becomes non-trivial for bigger-scale applications.
 
 For example,
 
@@ -122,7 +122,7 @@ Here is the list of the APIs you can use to explicitly emit change records:
 * [`Observable`](http://ibm-js.github.io/decor/docs/0.5.0/Observable.html) (In [decor](https://github.com/ibm-js/decor) library)
   * `#set()`
   * `.assign()` (New in 0.6.0)
-* [`ObservableArray`](http://ibm-js.github.io/liaison/docs/master/Observable.html)
+* [`ObservableArray`](http://ibm-js.github.io/liaison/docs/master/ObservableArray.html)
   * `#set()`
   * `#pop()`
   * `#push()`

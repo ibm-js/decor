@@ -8,7 +8,7 @@ define([
 	/* jshint withstmt: true */
 	/* global describe, afterEach, it */
 	with (bdd) {
-		describe("Test liaison/ObservableArray", function () {
+		describe("ObservableArray", function () {
 			var handles = [],
 				baseData = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
 			afterEach(function () {
