@@ -19,7 +19,9 @@ define({
 		// {browserName: "android", platform: "Linux", version: "4.1", name: "decor"},
 		// {browserName: "android", platform: "Linux", "device-type": "tablet", version: "4.0", name: "decor"},
 		// {browserName: "android", platform: "Linux", version: "4.0", name: "decor"},
-		{ browserName: "iphone", platform: "OS X 10.10", version: "10.2", deviceName: "iPad Retina", name: "decor" }
+		{ browserName: "iphone", platform: "OS X 10.10", version: "10.2", deviceName: "iPad Retina", name: "decor" },
+		{ browserName: "android", platform: "Linux", version: "6.0",
+			deviceName: "Android Emulator", deviceType: "tablet", name: "decor" }
 	],
 
 	maxConcurrency: 5,

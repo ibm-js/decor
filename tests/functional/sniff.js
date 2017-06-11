@@ -31,14 +31,14 @@ define(["intern",
 
 					// Check browser flags.
 					function shouldDetectOnlyBrowsers(expected) {
-						Object.keys(has).forEach(function (flags) {
-							if (flags === "mac") {
+						Object.keys(has).forEach(function (flag) {
+							if (flag === "mac" || flag === "android") {
 								return;
 							}
-							if (expected.indexOf(flags) > -1) {
-								assert.ok(has[flags], "detected " + flags + " as expected");
+							if (expected.indexOf(flag) > -1) {
+								assert.ok(has[flag], "detected " + flag + " as expected");
 							} else {
-								assert.notOk(has[flags], "didn't detect " + flags + " as expected");
+								assert.notOk(has[flag], "didn't detect " + flag + " as expected");
 							}
 						});
 					}
