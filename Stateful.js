@@ -232,9 +232,8 @@ define([
 		 * Multiple changes to a property in a micro-task are squashed.
 		 * @method module:decor/Stateful#observe
 		 * @param {function} callback The callback.
-		 * @returns {module:decor/Stateful.PropertyListObserver}
-		 *     The observer that can be used to stop observation
-		 *     or synchronously deliver/discard pending change records.
+		 * @returns {Object}
+		 *     Object with `deliver()`, `discardChanges()`, and `remove()` methods.
 		 * @example
 		 *     var stateful = new (dcl(Stateful, {
 		 *             foo: undefined,
@@ -263,12 +262,17 @@ define([
 			// make this.deliver() and this.discardComputing() call deliver() and discardComputing() on new listener
 			var a1 = advise.after(this, "deliver", h.deliver.bind(h)),
 				a2 = advise.after(this, "discardChanges", h.discardChanges.bind(h));
-			advise.before(h, "close", function () {
-				a1.unadvise();
-				a2.unadvise();
-			});
 
-			return h;
+			return {
+				deliver: h.deliver.bind(h),
+				discardChanges: h.discardChanges.bind(h),
+				remove: function () {
+					a1.destroy();
+					a2.destroy();
+					h.close();
+					delete h.o;      // probably not necessary but avoids confusion using chrome mem-leak tool
+				}
+			};
 		},
 
 		/**
