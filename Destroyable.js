@@ -19,15 +19,15 @@ define([
 		destroy: dcl.advise({
 			before: function () {
 				this._beingDestroyed = true;
-				this._releaseHandles();
+				if (this._releaseHandles) {
+					this._releaseHandles();
+					delete this._releaseHandles;
+				}
 			},
 			after: function () {
 				this._destroyed = true;
 			}
 		}),
-
-		_releaseHandles: function () {
-		},
 
 		/**
 		 * Track specified handles and remove/destroy them when this instance is destroyed, unless they were
@@ -46,10 +46,7 @@ define([
 			// transform arguments into an Array
 			var ary = Array.prototype.slice.call(arguments);
 			ary.forEach(function (handle) {
-				// When this.destroy() is called, destroy handle.  Since I'm using advise.before(),
-				// the handle will be destroyed before a subclass's destroy() method starts running, before it calls
-				// this.inherited() or even if it doesn't call this.inherited() at all.  If that's an issue, make an
-				// onDestroy() method and connect to that instead.
+				// Register handle to be destroyed/released when this.destroy() is called.
 				var destroyMethodName;
 				var odh = advise.after(this, "_releaseHandles", function () {
 					handle[destroyMethodName]();
