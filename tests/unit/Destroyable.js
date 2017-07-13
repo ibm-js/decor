@@ -29,7 +29,88 @@ define([
 			}
 		},
 
-		general: function () {
+		"own() handle with destroy() method": function () {
+			var DestroyHandle = dcl(null, {
+				destroyCalls: 0,
+				destroy: function () {
+					this.destroyCalls++;
+				}
+			});
+			var handle1 = new DestroyHandle(),
+				handle2 = new DestroyHandle(),
+				handle3 = new DestroyHandle();
+
+			var destroyable = new Destroyable();
+
+			// Test multiple args to own() method.
+			destroyable.own(handle1, handle2, handle3);
+			
+			// Destroy one handle manually and then destroy the destroyable.
+			handle2.destroy();
+			assert.strictEqual(handle2.destroyCalls, 1, "handle2 after manual destroy");
+			
+			// destroy() should destroy handle1 and handle3, but not handle2, because it already destroyed
+			destroyable.destroy();
+			assert.strictEqual(handle1.destroyCalls, 1, "handle1");
+			assert.strictEqual(handle2.destroyCalls, 1, "handle2 after destroyable.destroy()");
+			assert.strictEqual(handle3.destroyCalls, 1, "handle3");
+		},
+
+		"own() handle with remove() method": function () {
+			var RemoveHandle = dcl(null, {
+				removeCalls: 0,
+				remove: function () {
+					this.removeCalls++;
+				}
+			});
+			var handle1 = new RemoveHandle(),
+				handle2 = new RemoveHandle(),
+				handle3 = new RemoveHandle();
+
+			var destroyable = new Destroyable();
+
+			// Test multiple calls to own().
+			destroyable.own(handle1);
+			destroyable.own(handle2);
+			destroyable.own(handle3);
+
+			// Destroy one handle manually and then destroy the destroyable.
+			handle2.remove();
+			assert.strictEqual(handle2.removeCalls, 1, "handle2 after manual remove");
+
+			// remove() should remove handle1 and handle3, but not handle2, because it already removeed
+			destroyable.destroy();
+			assert.strictEqual(handle1.removeCalls, 1, "handle1");
+			assert.strictEqual(handle2.removeCalls, 1, "handle2 after destroyable.destroy()");
+			assert.strictEqual(handle3.removeCalls, 1, "handle3");
+		},
+
+		"own() handle with cancel() method": function () {
+			var CancelHandle = dcl(null, {
+				cancelCalls: 0,
+				cancel: function () {
+					this.cancelCalls++;
+				}
+			});
+			var handle1 = new CancelHandle(),
+				handle2 = new CancelHandle(),
+				handle3 = new CancelHandle();
+
+			var destroyable = new Destroyable();
+			destroyable.own(handle1, handle2, handle3);
+
+			// Cancel one handle manually and then destroy the destroyable.
+			handle2.cancel();
+			assert.strictEqual(handle2.cancelCalls, 1, "handle2 after manual cancel");
+
+			// cancel() should cancel handle1 and handle3, but not handle2, because it already canceled
+			destroyable.destroy();
+			assert.strictEqual(handle1.cancelCalls, 1, "handle1");
+			assert.strictEqual(handle2.cancelCalls, 1, "handle2 after destroyable.destroy()");
+			assert.strictEqual(handle3.cancelCalls, 1, "handle3");
+		},
+
+		observers: function () {
 			var d = this.async(1000);
 
 			var SupportingWidget = dcl(null, {
@@ -125,52 +206,36 @@ define([
 			return d;
 		},
 
-		multipleDestroyFunctions: function () {
-			var removeCount = 0;
-			var destroyCount = 0;
-
-			var W1 = dcl(Destroyable, {
-				remove: function () {
-					removeCount++;
-					this.destroy();
-				},
+		"own() handle with destroy() and remove() methods": function () {
+			// A Store has destroy and remove methods.  Calling remove() should not disown the object.
+			var Store = dcl(Destroyable, {
+				destroyCount: 0,
 				destroy: function () {
-					destroyCount++;
+					this.destroyCount++;
+				},
+				
+				removeCount: 0,
+				remove: function () {
+					this.removeCount++;
 				}
 			});
 
-			var W2 = dcl(Destroyable, {
-				test: function () {
-					var w1 = new W1();
-					this.own(w1);
-					w1.destroy();
-				}
-			});
+			var myStore = new Store();
+			
+			var destroyable = new Destroyable();
+			destroyable.own(myStore);
 
-			var W3 = dcl(Destroyable, {
-				test: function () {
-					var w1 = new W1();
-					this.own(w1);
-					w1.remove();
-				}
-			});
-
-			var w2 = new W2();
-			w2.test();
-			w2.destroy();
-			assert.strictEqual(removeCount, 0, "remove #1");
-			assert.strictEqual(destroyCount, 1, "destroy #1");
-
-			removeCount = 0;
-			destroyCount = 0;
-			var w3 = new W3();
-			w3.test();
-			w3.destroy();
-			assert.strictEqual(removeCount, 1, "remove #2");
-			assert.strictEqual(destroyCount, 1, "destroy #2");
+			// Test that calling myStore.remove() doesn't disown the store.
+			myStore.remove();
+			assert.strictEqual(myStore.removeCount, 1, "remove #1");
+			assert.strictEqual(myStore.destroyCount, 0, "destroy #1");
+			
+			destroyable.destroy();
+			assert.strictEqual(myStore.removeCount, 1, "remove #2");
+			assert.strictEqual(myStore.destroyCount, 1, "destroy #2");
 		},
 
-		owningPromises: function () {
+		"own() of Promises": function () {
 			var cancels = [];
 
 			// own() can only handle Promises w/additional destroy() or cancel() method.

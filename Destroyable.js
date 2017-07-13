@@ -32,6 +32,11 @@ define([
 		/**
 		 * Track specified handles and remove/destroy them when this instance is destroyed, unless they were
 		 * already removed/destroyed manually.
+		 *
+		 * Each object passed to `own()` must either be a Promise (i.e. a thenable),
+		 * or have either a `destroy()`, `remove()`, or `cancel()` method.  If an object has more
+		 * than one of those methods, only the first matching one in the above list is used.
+		 *
 		 * @returns {Object[]} The array of specified handles, so you can do for example:
 		 * `var handle = this.own(on(...))[0];`
 		 * @protected
@@ -43,43 +48,39 @@ define([
 				"cancel"
 			];
 
-			// transform arguments into an Array
+			// Convert arguments to array.
 			var ary = Array.prototype.slice.call(arguments);
+
+			// Track each argument.
 			ary.forEach(function (handle) {
-				// Register handle to be destroyed/released when this.destroy() is called.
+				// Figure out name of method to destroy handle.
 				var destroyMethodName;
+				for (var i = 0; i < cleanupMethods.length; i++) {
+					if (cleanupMethods[i] in handle) {
+						destroyMethodName = cleanupMethods[i];
+						break;
+					}
+				}
+				if (!destroyMethodName) {
+					throw new TypeError("own() called with handle without destroy method");
+				}
+
+				// Register handle to be destroyed/released when this.destroy() is called.
 				var odh = advise.after(this, "_releaseHandles", function () {
 					handle[destroyMethodName]();
 				});
 
-				// Callback for when handle is manually destroyed.
-				var hdhs = [];
-
-				function onManualDestroy() {
-					odh.destroy();
-					hdhs.forEach(function (hdh) {
+				// Setup listeners for manual destroy of handle.
+				if (handle.then) {
+					// Special path for Promises.  Detect when Promise is settled and remove listener.
+					handle.then(odh.destroy.bind(odh), odh.destroy.bind(odh));
+				} else {
+					// Path for non-promises.  Use AOP to detect when handle is manually destroyed.
+					var hdh = advise.after(handle, destroyMethodName, function () {
+						odh.destroy();
 						hdh.destroy();
 					});
 				}
-
-				// Setup listeners for manual destroy of handle.
-				// Also compute destroyMethodName, used in listener above.
-				if (handle.then) {
-					// Special path for Promises.  Detect when Promise is settled.
-					handle.then(onManualDestroy, onManualDestroy);
-				}
-				cleanupMethods.forEach(function (cleanupMethod) {
-					if (typeof handle[cleanupMethod] === "function") {
-						if (!destroyMethodName) {
-							// Use first matching method name in above listener.
-							destroyMethodName = cleanupMethod;
-						}
-						if (!handle.then) {
-							// Path for non-promises.  Use AOP to detect when handle is manually destroyed.
-							hdhs.push(advise.after(handle, cleanupMethod, onManualDestroy));
-						}
-					}
-				});
 			}, this);
 
 			return ary;
