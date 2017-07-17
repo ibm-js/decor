@@ -3,9 +3,14 @@ define([
 	"dcl/advise",
 	"dcl/dcl",
 	"./features",
-	"./Observable"
-], function (advise, dcl, has, Observable) {
+	"./Notifier"
+], function (advise, dcl, has, Notifier) {
 	var apn = {};
+
+	// Object.is() polyfill from Observable.js
+	function is(lhs, rhs) {
+		return lhs === rhs && (lhs !== 0 || 1 / lhs === 1 / rhs) || lhs !== lhs && rhs !== rhs;
+	}
 
 	/**
 	 * Helper function to map "foo" --> "_setFooAttr" with caching to avoid recomputing strings.
@@ -23,19 +28,6 @@ define([
 			g: "_get" + uc + "Attr"
 		};
 		return ret;
-	}
-
-	/**
-	 * Utility function for notification.
-	 */
-	function notify(stateful, name, oldValue) {
-		Observable.getNotifier(stateful).notify({
-			// Property is never new because setting up shadow property defines the property
-			type: "update",
-			object: stateful,
-			name: name + "",
-			oldValue: oldValue
-		});
 	}
 
 	var REGEXP_IGNORE_PROPS = /^constructor$|^_set$|^_get$|^deliver$|^discardChanges$|^_(.+)Attr$/;
@@ -134,7 +126,6 @@ define([
 					ctor.prototype.introspect(ctor._props);
 					ctor._introspected = true;
 				}
-				Observable.call(this);
 			},
 
 			after: function (args) {
@@ -171,6 +162,10 @@ define([
 			}
 		},
 
+
+		// Hook to notify Notifier objects when any property's value has changed.
+		_notify: function () {},
+
 		/**
 		 * Internal helper for directly setting a property value without calling the custom setter.
 		 *
@@ -185,9 +180,7 @@ define([
 			var shadowPropName = propNames(name).p,
 				oldValue = this[shadowPropName];
 			this[shadowPropName] = value;
-			// Even if Object.observe() is natively available,
-			// automatic change record emission won't happen if there is a ECMAScript setter
-			!Observable.is(value, oldValue) && notify(this, name, oldValue);
+			!is(value, oldValue) && this._notify(name, oldValue);
 		},
 
 		/**
@@ -212,7 +205,7 @@ define([
 		 */
 		notifyCurrentValue: function () {
 			Array.prototype.forEach.call(arguments, function (name) {
-				notify(this, name, this[propNames(name).p]);
+				this._notify(name, this[propNames(name).p]);
 			}, this);
 		},
 
@@ -255,22 +248,26 @@ define([
 		 *     stateful.baz = 10;
 		 */
 		observe: function (callback) {
-			// create new listener
-			var h = new Stateful.PropertyListObserver(this, this.getPropsToObserve());
-			h.open(callback, this);
+			var h = new Notifier(callback.bind(this));
 
-			// make this.deliver() and this.discardComputing() call deliver() and discardComputing() on new listener
-			var a1 = advise.after(this, "deliver", h.deliver.bind(h)),
-				a2 = advise.after(this, "discardChanges", h.discardChanges.bind(h));
+			// Tell the Notifier when any property's value is changed,
+			// Also, make this.deliver() and this.discardComputing() call deliver() and discardComputing() on Notifier.
+			var advices = [
+				advise.after(this, "_notify", function (args) {
+					h.notify(args[0], args[1]);
+				}),
+				advise.after(this, "deliver", h.deliver.bind(h)),
+				advise.after(this, "discardChanges", h.discardChanges.bind(h))
+			];
 
 			return {
 				deliver: h.deliver.bind(h),
 				discardChanges: h.discardChanges.bind(h),
 				remove: function () {
-					a1.destroy();
-					a2.destroy();
-					h.close();
-					delete h.o;      // probably not necessary but avoids confusion using chrome mem-leak tool
+					h.discardChanges();
+					advices.forEach(function (advice) {
+						advice.destroy();
+					});
 				}
 			};
 		},
@@ -289,93 +286,6 @@ define([
 	});
 
 	dcl.chainAfter(Stateful, "introspect");
-
-	/**
-	 * An observer to observe a set of {@link module:decor/Stateful Stateful} properties at once.
-	 * This class is what {@link module:decor/Stateful#observe} returns.
-	 * @class module:decor/Stateful.PropertyListObserver
-	 * @param {Object} o - The {@link module:decor/Stateful Stateful} being observed.
-	 * @param {Object} props - Hash of properties to observe.
-	 */
-	Stateful.PropertyListObserver = function (o, props) {
-		this.o = o;
-		this.props = props;
-	};
-
-	Stateful.PropertyListObserver.prototype = {
-		/**
-		 * Starts the observation.
-		 * {@link module:decor/Stateful#observe `Stateful#observe()`} calls this method automatically.
-		 * @method module:decor/Stateful.PropertyListObserver#open
-		 * @param {function} callback The change callback.
-		 * @param {Object} thisObject The object that should work as "this" object for callback.
-		 */
-		open: function (callback, thisObject) {
-			var props = this.props;
-			this._boundCallback = function (records) {
-				if (!this._closed && !this._beingDiscarded) {
-					var oldValues = {};
-					records.forEach(function (record) {
-						// for consistency with platforms w/out native Object.observe() support,
-						// only notify about updates to properties in prototype (see getProps())
-						if (record.name in props && !(record.name in oldValues)) {
-							oldValues[record.name] = record.oldValue;
-						}
-					});
-					/* jshint unused: false */
-					for (var s in oldValues) {
-						callback.call(thisObject, oldValues);
-						break;
-					}
-				}
-			}.bind(this);
-			this._h = Observable.observe(this.o, this._boundCallback);
-			return this.o;
-		},
-
-		/**
-		 * Synchronously delivers pending change records.
-		 * @method module:decor/Stateful.PropertyListObserver#deliver
-		 */
-		deliver: function () {
-			this._boundCallback && Observable.deliverChangeRecords(this._boundCallback);
-		},
-
-		/**
-		 * Discards pending change records.
-		 * @method module:decor/Stateful.PropertyListObserver#discardChanges
-		 */
-		discardChanges: function () {
-			this._beingDiscarded = true;
-			this._boundCallback && Observable.deliverChangeRecords(this._boundCallback);
-			this._beingDiscarded = false;
-			return this.o;
-		},
-
-		/**
-		 * Does nothing, just exists for API compatibility with liaison and other data binding libraries.
-		 * @method module:decor/Stateful.PropertyListObserver#setValue
-		 */
-		setValue: function () {},
-
-		/**
-		 * Stops the observation.
-		 * @method module:decor/Stateful.PropertyListObserver#close
-		 */
-		close: function () {
-			if (this._h) {
-				this._h.remove();
-				this._h = null;
-			}
-			this._closed = true;
-		}
-	};
-
-	/**
-	 * Synonym for {@link module:decor/Stateful.PropertyListObserver#close `close()`}.
-	 * @method module:decor/Stateful.PropertyListObserver#remove
-	 */
-	Stateful.PropertyListObserver.prototype.remove = Stateful.PropertyListObserver.prototype.close;
 
 	return Stateful;
 });
