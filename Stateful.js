@@ -264,10 +264,15 @@ define([
 				deliver: h.deliver.bind(h),
 				discardChanges: h.discardChanges.bind(h),
 				remove: function () {
-					h.discardChanges();
-					advices.forEach(function (advice) {
-						advice.destroy();
-					});
+					if (!this._removed) {
+						h.discardChanges();
+						advices.forEach(function (advice) {
+							advice.destroy();
+						});
+						h = null;
+						advices = null;
+						this._removed = true;
+					}
 				}
 			};
 		},

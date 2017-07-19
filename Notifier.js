@@ -6,15 +6,6 @@ define([
 	dcl,
 	schedule
 ) {
-	function hasProp(obj) {
-		for (var key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	// Keep track of order that callbacks were registered, we will call them in that order
 	// regardless of the order the objects were updated.
 	var seq = 0;
@@ -53,14 +44,24 @@ define([
 	 * Object to be notified of changes to specified object, queue up those changes,
 	 * and eventually call the specified callback with summary of those changes.
 	 */
-	return dcl(null, {
-		constructor: function (callback) {
-			this._seq = seq++;
-			this.callback = callback;
-			this.oldVals = {};
-		},
+	var Notifier = function (callback) {
+		this._seq = seq++;
+		this.callback = callback;
+	};
 
+	Notifier.prototype = /** @lends module:decor/Notifier */ {
+		/**
+		 * Record that specified property has changed.
+		 * It will be notified at the end of microtask, or when deliver() is called.
+		 * @method module:decor/Notifier#notify
+		 * @param {string} prop - name of property
+		 * @param oldVal - old value of property
+		 */
 		notify: function (prop, oldVal) {
+			if (!this.oldVals) {
+				this.oldVals = {};
+			}
+
 			if (!(prop in this.oldVals)) {
 				this.oldVals[prop] = oldVal;
 				hotChangeCollectors[this._seq] = this;
@@ -75,18 +76,28 @@ define([
 			}
 		},
 
+		/**
+		 * Call callback with set of properties that have changed, and their old values.
+		 * @method module:decor/Notifier#deliver
+		 */
 		deliver: function () {
-			if (hasProp(this.oldVals)) {
+			if (this.oldVals) {
 				var oldVals = this.oldVals;
-				this.oldVals = {};
+				delete this.oldVals;
 				delete hotChangeCollectors[this._seq];
 				this.callback(oldVals);
 			}
 		},
 
+		/**
+		 * Discard all changes queued up by notify().
+		 * @method module:decor/Notifier#discardChanges
+		 */
 		discardChanges: function () {
-			this.oldVals = {};
+			delete this.oldVals;
 			delete hotChangeCollectors[this._seq];
 		}
-	});
+	};
+
+	return Notifier;
 });

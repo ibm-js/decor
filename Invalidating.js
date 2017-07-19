@@ -68,6 +68,11 @@ define([
 			return this._hComputing;
 		},
 
+		destroy: function () {
+			this._hComputing = null;
+			this._hRendering = null;
+		},
+
 		/**
 		 * Function to return if rendering should be initialized.
 		 * (Instead of making partial changes for post-initialization)
