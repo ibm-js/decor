@@ -56,7 +56,7 @@ define([
 	 * });
 	 * obj.foo = bar;
 	 * // Stateful by default interprets the first parameter passed to
-	 * // the constructor as a set of properties to set on the widget 
+	 * // the constructor as a set of properties to set on the widget
 	 * // immediately after it is created.
 	 *
 	 * @example <caption>Example 2</caption>
@@ -163,9 +163,6 @@ define([
 		},
 
 
-		// Hook to notify Notifier objects when any property's value has changed.
-		_notify: function () {},
-
 		/**
 		 * Internal helper for directly setting a property value without calling the custom setter.
 		 *
@@ -180,7 +177,7 @@ define([
 			var shadowPropName = propNames(name).p,
 				oldValue = this[shadowPropName];
 			this[shadowPropName] = value;
-			!is(value, oldValue) && this._notify(name, oldValue);
+			!is(value, oldValue) && this._notify && this._notify(name, oldValue);
 		},
 
 		/**
@@ -204,9 +201,11 @@ define([
 		 * @param {...string} name The property name.
 		 */
 		notifyCurrentValue: function () {
-			Array.prototype.forEach.call(arguments, function (name) {
-				this._notify(name, this[propNames(name).p]);
-			}, this);
+			if (this._notify) {
+				Array.prototype.forEach.call(arguments, function (name) {
+					this._notify(name, this[propNames(name).p]);
+				}, this);
+			}
 		},
 
 		/**
