@@ -83,22 +83,29 @@ define([
 	return function (model, view, mapping) {
 		if (Array.isArray(mapping)) {
 			// Copy from model to view.
-			observe(model, function () {
+			var handle1 = observe(model, function () {
 				mapping.forEach(function (map) {
 					prop(view, map.view, map.modelToView ? map.modelToView(model) : prop(model, map.model));
 				});
 			});
 
 			// Copy from view to model.
-			observe(view, function () {
+			var handle2 = observe(view, function () {
 				mapping.forEach(function (map) {
 					if (map.twoWay) {
 						prop(model, map.model,  map.viewToModel ? map.viewToModel(view) : prop(view, map.view));
 					}
 				});
 			});
+
+			return {
+				remove: function () {
+					handle1.remove();
+					handle2.remove();
+				}
+			};
 		} else {
-			observe(model, function () {
+			return observe(model, function () {
 				Object.keys(mapping).forEach(function (key) {
 					var map = mapping[key];
 					prop(view, key, typeof map === "function" ? map(model) : prop(model, map));
