@@ -13,7 +13,7 @@ define({
 			name : "decor"},
 		{ browserName: "chrome", version: "58", platform: [ /* "OS X 10.6", "Linux", */ "Windows 7" ],
 			name : "decor"},
-		{ browserName: "safari", platform: "macOS 10.12",  version: "10.0", seleniumVersion: "3.4.0", name: "decor" },
+		{ browserName: "safari", platform: "macOS 10.13",  version: "11.0", name: "decor" },
 		// {browserName: "android", platform: "Linux", version: "4.1", name: "decor"},
 		// {browserName: "android", platform: "Linux", "device-type": "tablet", version: "4.1", name: "decor"},
 		// {browserName: "android", platform: "Linux", version: "4.1", name: "decor"},
