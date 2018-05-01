@@ -294,6 +294,26 @@ define([
 			}), 1);
 		},
 
+		"HTML elements treated as scalars": function () {
+			var dfd = this.async(1000);
+			var log = [];
+			var pojo = {
+				a: 1,
+				b: null
+			};
+
+			handles.push(observe(pojo, function (oldVals) {
+				log.push(oldVals);
+			}));
+
+			pojo.b = document.createElement("div");
+
+			setTimeout(dfd.callback(function () {
+				// Don't do an assert() because the log has a ridiculous number of entries.
+				// Not infinite, but every node etc. in the document.
+			}), 1);
+		},
+
 		"observe decor/Stateful subclass": function () {
 			var dfd = this.async(1000);
 			var MyClass = dcl(Stateful, {

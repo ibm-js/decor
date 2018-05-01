@@ -13,11 +13,14 @@ define([
 		return lhs === rhs && (lhs !== 0 || 1 / lhs === 1 / rhs) || lhs !== lhs && rhs !== rhs;
 	}
 
+	function isObject(obj) {
+		return obj && typeof obj === "object" && !(obj instanceof HTMLElement);
+	}
 	// Deep compare oldObj to newObj and call notify() for properties that were changed or added in newObj.
 	function diff(oldObj, newObj, notify, prefix) {
 		for (var prop in newObj) {
 			if (!oldObj || !(prop in oldObj) || !is(oldObj[prop], newObj[prop])) {
-				if (newObj[prop] && typeof newObj[prop] === "object") {
+				if (isObject(newObj[prop])) {
 					diff(oldObj && oldObj[prop], newObj[prop], notify, prefix + prop + ".");
 				} else {
 					notify(prefix + prop, oldObj ? oldObj[prop] : undefined, newObj[prop]);
@@ -47,7 +50,7 @@ define([
 				// If property is an object then set up listener on that object too.
 				// Note: In the future, may want to exclude arrays?  They could be long.
 				var nestedWatcher;
-				if (curVal && typeof curVal === "object") {
+				if (isObject(curVal)) {
 					nestedWatcher = watchPojo(curVal, function (nestedProp, nestedOldVal, nestedNewVal) {
 						callback(prop + "." + nestedProp, nestedOldVal, nestedNewVal);
 					});
@@ -70,7 +73,7 @@ define([
 						}
 
 						// If new value is an object, set up listener on that object.
-						if (newVal && typeof newVal === "object") {
+						if (isObject(newVal)) {
 							nestedWatcher = watchPojo(newVal, function (nestedProp, nestedOldVal, nestedNewVal) {
 								callback(prop + "." + nestedProp, nestedOldVal, nestedNewVal);
 							});
@@ -86,7 +89,7 @@ define([
 							});
 						}
 
-						if (newVal && typeof newVal === "object") {
+						if (isObject(newVal)) {
 							// Recursive diff oldVal vs. newVal and send notifications of nested prop changes.
 							diff(oldVal, newVal, notify, prop + ".");
 						} else {
