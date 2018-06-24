@@ -9,9 +9,7 @@ define(["./intern"], function (intern) {
 	// intern.proxyUrl = "http://mac.local:9000";
 
 	intern.environments = [
-		{ browserName: "firefox" },
-		{ browserName: "chrome" },
-		{ browserName: "internet explorer", requireWindowFocus: "true" }
+		{ browserName: "chrome" }
 	];
 
 	intern.maxConcurrency = 1;
