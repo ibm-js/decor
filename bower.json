@@ -2,7 +2,7 @@
 	"name": "decor",
 	"version": "0.7.0",
 	"dependencies": {
-		"dcl": "1.1.x",
+		"dcl": "^2.0.6",
 		"requirejs": "2.1.x",
 		"requirejs-dplugins": "0.6.x"
 	},
