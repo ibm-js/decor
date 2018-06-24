@@ -1,8 +1,9 @@
 /** @module decor/Destroyable */
 define([
 	"dcl/advise",
-	"dcl/dcl"
-], function (advise, dcl) {
+	"dcl/dcl",
+	"dcl/mixins/Destroyable"
+], function (advise, dcl, Destroyable) {
 	/**
 	 * Mixin to track handles and release them when instance is destroyed.
 	 *
@@ -11,7 +12,7 @@ define([
 	 * Then call `destroy()` later to destroy this instance and release the resources.
 	 * @mixin module:decor/Destroyable
 	 */
-	var Destroyable = dcl(null, /** @lends module:decor/Destroyable# */ {
+	return dcl(Destroyable, /** @lends module:decor/Destroyable# */ {
 		/**
 		 * Destroy this class, releasing any resources registered via `own()`.
 		 * @method
@@ -119,8 +120,4 @@ define([
 			};
 		}
 	});
-
-	dcl.chainBefore(Destroyable, "destroy");
-
-	return Destroyable;
 });
