@@ -409,8 +409,7 @@ define([
 			stateful.observe(dfd.callback(function (oldValues) {
 				assert.deepEqual(oldValues, {
 					_private: 1,
-					foo: 2,
-					anotherFunc: nop
+					foo: 2
 				});
 			}));
 			stateful._private = 11;

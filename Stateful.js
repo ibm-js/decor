@@ -30,7 +30,7 @@ define([
 		return ret;
 	}
 
-	var REGEXP_IGNORE_PROPS = /^constructor$|^_set$|^_get$|^deliver$|^discardChanges$|^_(.+)Attr$/;
+	var REGEXP_IGNORE_PROPS = /^_(.+)Attr$/;
 
 	/**
 	 * Base class for objects that provide named properties with optional getter/setter
@@ -74,7 +74,7 @@ define([
 		getProps: function () {
 			var hash = {};
 			for (var prop in this) {
-				if (!REGEXP_IGNORE_PROPS.test(prop)) {
+				if (typeof this[prop] !== "function" && !REGEXP_IGNORE_PROPS.test(prop)) {
 					hash[prop] = true;
 				}
 			}
