@@ -20,10 +20,10 @@ define([
 	function diff(oldObj, newObj, notify, prefix) {
 		for (var prop in newObj) {
 			if (!oldObj || !(prop in oldObj) || !is(oldObj[prop], newObj[prop])) {
-				if (isObject(newObj[prop])) {
-					diff(oldObj && oldObj[prop], newObj[prop], notify, prefix + prop + ".");
+				if (isObject(oldObj[prop]) && isObject(newObj[prop])) {
+					diff(oldObj[prop], newObj[prop], notify, prefix + prop + ".");
 				} else {
-					notify(prefix + prop, oldObj ? oldObj[prop] : undefined, newObj[prop]);
+					notify(prefix + prop, oldObj ? oldObj[prop] : undefined, newObj ? newObj[prop] : undefined);
 				}
 			}
 		}
@@ -48,7 +48,6 @@ define([
 				var curVal = pojo[prop];
 
 				// If property is an object then set up listener on that object too.
-				// Note: In the future, may want to exclude arrays?  They could be long.
 				var nestedWatcher;
 				if (isObject(curVal)) {
 					nestedWatcher = watchPojo(curVal, function (nestedProp, nestedOldVal, nestedNewVal) {
@@ -89,7 +88,7 @@ define([
 							});
 						}
 
-						if (isObject(newVal)) {
+						if (isObject(oldVal) && isObject(newVal)) {
 							// Recursive diff oldVal vs. newVal and send notifications of nested prop changes.
 							diff(oldVal, newVal, notify, prop + ".");
 						} else {

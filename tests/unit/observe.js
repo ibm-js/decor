@@ -294,6 +294,58 @@ define([
 			}), 1);
 		},
 
+		"arrays and scalars": function () {
+			var dfd = this.async(1000);
+			var log = [];
+			var pojo = {
+				foo: "Foo0",
+				bar: "Bar0",
+				ary: [1, 2, 3, 4, 5]
+			};
+			handles.push(observe(pojo, function (oldVals) {
+				log.push(oldVals);
+			}));
+
+			// Change array child.
+			pojo.ary[2] = -3;
+			pojo.foo = "Foo1";
+
+			setTimeout(dfd.rejectOnError(function () {
+				assert.deepEqual(log, [
+					{
+						"ary.2": 3,
+						foo: "Foo0"
+					}
+				], "change in array element");
+
+				log = [];
+
+				// Change array to scalar
+				pojo.ary = "Hello world";
+
+				setTimeout(dfd.rejectOnError(function () {
+					assert.deepEqual(log, [
+						{
+							ary: [1, 2, -3, 4, 5]
+						}
+					], "array to scalar");
+
+					log = [];
+
+					// Change scalar to array
+					pojo.ary = [1, 2, 3, 4, 5];
+
+					setTimeout(dfd.callback(function () {
+						assert.deepEqual(log, [
+							{
+								ary: "Hello world"
+							}
+						], "scalar to array");
+					}), 1);
+				}), 1);
+			}), 1);
+		},
+
 		"HTML elements treated as scalars": function () {
 			var dfd = this.async(1000);
 			var log = [];
