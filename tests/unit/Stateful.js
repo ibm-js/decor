@@ -416,6 +416,45 @@ define([
 			stateful.foo = 22;
 			stateful.anotherFunc = function () { };
 			stateful.instanceProp = 33;
+		},
+
+		"enumeration": function () {
+			// Test ability to hide all the properties (including inherited ones)
+			// except the ones that should be public.
+			var dfd = this.async(1000);
+			var StatefulClass1 = dcl(Stateful, {
+				foo: 0,
+				bar: 0,
+				barAlias: dcl.prop({
+					set: function (val) { this.bar = val; },
+					get: function () { return this.bar; }
+				})
+			});
+			var instance1 = new StatefulClass1();
+
+			// Make sure that shadow properties and Stateful methods aren't enumerable.
+			var forEachKeys = [];
+			for (var key in instance1) {
+				forEachKeys.push(key);
+			}
+			assert.deepEqual(forEachKeys, ["foo", "bar"], "forEachKeys #1");
+
+			instance1.observe(dfd.callback(function (oldValues) {
+				assert.deepEqual(oldValues, {
+					foo: 0,
+					bar: 0
+				});
+			}));
+
+			instance1.foo = 1;
+			instance1.barAlias = 1;
+
+			// Make sure that changing foo didn't make the _shadowFooAttr property visible.
+			forEachKeys = [];
+			for (var key in instance1) {
+				forEachKeys.push(key);
+			}
+			assert.deepEqual(forEachKeys, ["foo", "bar"], "forEachKeys #2");
 		}
 	});
 });

@@ -96,12 +96,17 @@ define([
 					getter = names.g,
 					setter = names.s;
 
+				// Setup hidden shadow property to store the original value of the property.
+				// For a property named foo, saves raw value in _shadowFooAttr.
+				Object.defineProperty(this, shadowProp, {
+					enumerable: false,
+					configurable: false,
+					value: this[prop]
+				});
+
 				// Setup ES5 getter and setter for this property.
-				// For a property named foo, saves raw value in _fooAttr.
 				// ES5 setter intentionally does late checking for this[names.s] in case a subclass sets up a
 				// _setFooAttr method.
-				this[shadowProp] = this[prop];
-				delete this[prop]; // make sure custom setters fire
 				Object.defineProperty(this, prop, {
 					enumerable: true,
 					configurable: true,
@@ -157,9 +162,7 @@ define([
 		 */
 		mix: function (hash) {
 			for (var x in hash) {
-				if (hash.hasOwnProperty(x)) {
-					this[x] = hash[x];
-				}
+				this[x] = hash[x];
 			}
 		},
 
@@ -177,7 +180,15 @@ define([
 		_set: function (name, value) {
 			var shadowPropName = propNames(name).p,
 				oldValue = this[shadowPropName];
-			this[shadowPropName] = value;
+
+			// Add the shadow property to the instance, masking what's in the prototype.
+			// Use Object.defineProperty() so it's hidden from for(var key in ...) and Object.keys().
+			Object.defineProperty(this, shadowPropName, {
+				enumerable: false,
+				configurable: true,
+				value: value
+			});
+
 			!is(value, oldValue) && this._notify && this._notify(name, oldValue);
 		},
 
@@ -278,6 +289,13 @@ define([
 		},
 
 		/**
+		 * Don't call this directly, it's a hook-point to register listeners.
+		 * @private
+		 */
+		_notify: function () {
+		},
+
+		/**
 		 * Synchronously deliver change records to all listeners registered via `observe()`.
 		 */
 		deliver: function () {
@@ -288,6 +306,8 @@ define([
 		 */
 		discardChanges: function () {
 		}
+	}, {
+		enumerable: false
 	});
 
 	dcl.chainAfter(Stateful, "introspect");
