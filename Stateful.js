@@ -19,32 +19,22 @@ define([
 		if (apn[name]) {
 			return apn[name];
 		}
-		var uc = name.replace(/^[a-z]|-[a-zA-Z]/g, function (c) {
-			return c.charAt(c.length - 1).toUpperCase();
-		});
 		var ret = apn[name] = {
-			p: "_shadow" + uc + "Attr",	// shadow property, since real property hidden by setter/getter
-			s: "_set" + uc + "Attr",	// converts dashes to camel case, ex: accept-charset --> _setAcceptCharsetAttr
-			g: "_get" + uc + "Attr"
+			s: "_" + name + "Shadow",	// shadow property, used for storage by accessors
+			o: "_" + name + "Old"		// used to track when value has changed
 		};
 		return ret;
 	}
 
-	var REGEXP_IGNORE_PROPS = /^_(.+)Attr$/;
+	// Track which objects have been introspected already.
+	var instrumentedObjects = new WeakMap();
 
 	/**
-	 * Base class for objects that provide named properties with optional getter/setter
-	 * control and the ability to observe for property changes.
+	 * Base class for objects that provide named properties with the ability to observe for property changes.
+	 * Note though that expando properties (i.e. properties added to an instance but not in the prototype) are not
+	 * observable for changes.
 	 *
-	 * The class also provides the functionality to auto-magically manage getters
-	 * and setters for class attributes/properties.  Note though that expando properties
-	 * (i.e. properties added to an instance but not in the prototype) are not supported.
-	 *
-	 * Getters and Setters should follow the format of `_setXxxAttr` or `_getXxxAttr` where
-	 * the xxx is a name of the attribute to handle.  So an attribute of `foo`
-	 * would have a custom getter of `_getFooAttr` and a custom setter of `_setFooAttr`.
-	 * Setters must save and announce the new property value by calling `this._set("foo", val)`,
-	 * and getters should access the property value as `this._get("foo")`.
+	 * Also has _set() and _get methods for helping to write custom accessors.
 	 *
 	 * @example <caption>Example 1</caption>
 	 * var MyClass = dcl(Stateful, { foo: "initial" });
@@ -55,9 +45,9 @@ define([
 	 *    }
 	 * });
 	 * obj.foo = bar;
-	 * // Stateful by default interprets the first parameter passed to
-	 * // the constructor as a set of properties to set on the widget
-	 * // immediately after it is created.
+	 *
+	 * Stateful by default interprets the first parameter passed to the constructor as a set of properties to
+	 * mix in to the instance immediately after it is created:
 	 *
 	 * @example <caption>Example 2</caption>
 	 * var MyClass = dcl(Stateful, { foo: "initial" });
@@ -68,53 +58,87 @@ define([
 	var Stateful = dcl(/** @lends module:decor/Stateful# */ {
 		declaredClass: "decor/Stateful",
 
+		// Flag used by instrument()
+		_isStatefulSuperclass: true,
+
 		/**
-		 * Returns a hash of properties that should be observed.
-		 * @returns {Object} Hash of properties.
+		 * Sets up ES5 getters/setters for every enumerated property in every object in the prototype chain.
 		 * @protected
 		 */
-		getProps: function () {
-			var hash = {};
-			for (var prop in this) {
-				if (typeof this[prop] !== "function" && !REGEXP_IGNORE_PROPS.test(prop)) {
-					hash[prop] = true;
+		instrument: function () {
+			// Instrument all objects in the prototype chain excluding a base class of HTMLElement, i.e. all objects
+			// up to and including the one with the _isStatefulSuperclass flag.
+			// Note: must instrument the object with the _isStatefulSuperclass flag because it might not just be
+			// Stateful, but a mixture of Stateful properties with other classes' properties, due to complexities of
+			// how dcl() handles multiple inheritance and also complications from having HTMLElement (or any non-dcl
+			// class?) in the prototype chain.
+			var proto = this;
+			do {
+				proto = Object.getPrototypeOf(proto);
+				if (!instrumentedObjects.has(proto)) {
+					this.instrumentObject(proto);
+					instrumentedObjects.set(proto, true);
 				}
-			}
-			return hash;
+			} while (!proto.hasOwnProperty("_isStatefulSuperclass"));
 		},
 
 		/**
-		 * Sets up ES5 getters/setters for each class property.
-		 * Inside introspect(), "this" is a reference to the prototype rather than any individual instance.
-		 * @param {Object} props - Hash of properties.
-		 * @protected
+		 * Instrument enumerable properties of one object in the prototype chain.
 		 */
-		introspect: function (props) {
-			Object.keys(props).forEach(function (prop) {
+		instrumentObject: function (proto) {
+			Object.keys(proto).forEach(function (prop) {
+				// Skip functions, instrumenting them will break calls like advice.after(widget, "destroy", ...).
+				if (typeof proto[prop] === "function") {
+					return;
+				}
+
 				var names = propNames(prop),
-					shadowProp = names.p,
-					getter = names.g,
-					setter = names.s;
+					shadowProp = names.s,
+					oldProp = names.o;
 
 				// Setup hidden shadow property to store the original value of the property.
-				// For a property named foo, saves raw value in _shadowFooAttr.
-				Object.defineProperty(this, shadowProp, {
+				// For a property named foo, saves raw value in _fooShadow.
+				Object.defineProperty(proto, shadowProp, {
 					enumerable: false,
 					configurable: false,
-					value: this[prop]
+					value: proto[prop]
 				});
+				
+				// Setup ES5 getter and setter for this property, unless it already has custom ones.
+				var descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+				if (!descriptor.set) {
+					Object.defineProperty(proto, prop, {
+						enumerable: true,
+						configurable: true,
+						set: function (val) {
+							// Put shadow property in instance, masking the one in the prototype chain.
+							Object.defineProperty(this, shadowProp, {
+								enumerable: false,
+								configurable: true,
+								value: val
+							});
+						},
+						get: function () {
+							return this[shadowProp];
+						}
+					});
+				}
 
-				// Setup ES5 getter and setter for this property.
-				// ES5 setter intentionally does late checking for this[names.s] in case a subclass sets up a
-				// _setFooAttr method.
-				Object.defineProperty(this, prop, {
-					enumerable: true,
-					configurable: true,
-					set: function (x) {
-						setter in this ? this[setter](x) : this._set(prop, x);
-					},
-					get: function () {
-						return getter in this ? this[getter]() : this[shadowProp];
+				// Track when user changes the value.
+				advise(proto, prop, {
+					set: {
+						before: function () {
+							// Save old value before it's overwritten.
+							this[oldProp] = this[prop];
+						},
+						after: function () {
+							var oldValue = this[oldProp],
+								newValue = this[prop];
+							if (!is(newValue, oldValue)) {
+								this._notify(prop, oldValue);
+							}
+							delete this[oldProp];
+						}
 					}
 				});
 			}, this);
@@ -122,15 +146,13 @@ define([
 
 		constructor: dcl.advise({
 			before: function () {
-				// First time this class is instantiated, introspect it.
-				// Use _introspected flag on constructor, rather than prototype, to avoid hits when superclass
+				// First time this class is instantiated, instrument it.
+				// Use _instrumented flag on constructor, rather than prototype, to avoid hits when superclass
 				// was already inspected but this class wasn't.
 				var ctor = this.constructor;
-				if (!ctor._introspected) {
-					// note: inside getProps() and introspect(), this refs prototype
-					ctor._props = ctor.prototype.getProps();
-					ctor.prototype.introspect(ctor._props);
-					ctor._introspected = true;
+				if (!ctor._instrumented) {
+					this.instrument();
+					ctor._instrumented = true;
 				}
 			},
 
@@ -166,21 +188,15 @@ define([
 			}
 		},
 
-
 		/**
-		 * Internal helper for directly setting a property value without calling the custom setter.
-		 *
-		 * Directly changes the value of an attribute on an object, bypassing any
-		 * accessor setter.  Also notifies callbacks registered via observe().
-		 * Custom setters should call `_set` to actually record the new value.
+		 * Helper for custom accessors, set value for "shadow" copy of a property.
 		 * @param {string} name - The property to set.
 		 * @param {*} value - Value to set the property to.
 		 * @protected
 		 */
 		_set: function (name, value) {
-			var shadowPropName = propNames(name).p,
-				oldValue = this[shadowPropName];
-
+			var shadowPropName = propNames(name).s;
+			
 			// Add the shadow property to the instance, masking what's in the prototype.
 			// Use Object.defineProperty() so it's hidden from for(var key in ...) and Object.keys().
 			Object.defineProperty(this, shadowPropName, {
@@ -188,22 +204,26 @@ define([
 				configurable: true,
 				value: value
 			});
-
-			!is(value, oldValue) && this._notify && this._notify(name, oldValue);
 		},
 
 		/**
-		 * Internal helper for directly accessing an attribute value.
-		 *
-		 * Directly gets the value of an attribute on an object, bypassing any accessor getter.
-		 * It is designed to be used by descendant class if they want
-		 * to access the value in their custom getter before returning it.
+		 * Helper for custom accessors, returns value of "shadow" copy of a property.
 		 * @param {string} name - Name of property.
 		 * @returns {*} Value of property.
 		 * @protected
 		 */
 		_get: function (name) {
-			return this[propNames(name).p];
+			return this[propNames(name).s];
+		},
+
+		/**
+		 * Returns true if _set() has been called to save a custom value for the specified property.
+		 * @param {string} name - Name of property.
+		 * @returns {*} Value of property.
+		 * @protected
+		 */
+		_has: function (name) {
+			return this.hasOwnProperty(propNames(name).s);
 		},
 
 		/**
@@ -215,18 +235,9 @@ define([
 		notifyCurrentValue: function () {
 			if (this._notify) {
 				Array.prototype.forEach.call(arguments, function (name) {
-					this._notify(name, this[propNames(name).p]);
+					this._notify(name, this[name]);
 				}, this);
 			}
-		},
-
-		/**
-		 * Get list of properties that Stateful#observe() should observe.
-		 * @returns {string[]} list of properties
-		 * @protected
-		 */
-		getPropsToObserve: function () {
-			return this.constructor._props;
 		},
 
 		/**
@@ -310,7 +321,7 @@ define([
 		enumerable: false
 	});
 
-	dcl.chainAfter(Stateful, "introspect");
+	dcl.chainAfter(Stateful, "instrument");
 
 	return Stateful;
 });

@@ -6,54 +6,47 @@ define([
 ], function (registerSuite, assert, Stateful, dcl) {
 	registerSuite({
 		name: "Stateful",
+
 		"accessors": function () {
 			var StatefulClass1 = dcl(Stateful, {
-				foo: 0,
-				bar: 0,
-				baz: "",
-
-				_getFooAttr: function () {
-					return this._get("foo") - 1;
-				},
-
-				_setBarAttr: function (value) {
-					this._set("bar", value + 1);
-				}
+				foo: dcl.prop({
+					set: function (val) {
+						this._set("foo", val);
+					},
+					get: function () {
+						return (this._has("foo") ? this._get("foo") : 0) - 1;
+					},
+					enumerable: true,
+					configurable: true
+				}),
+				bar: dcl.prop({
+					set: function (val) {
+						this._set("bar", val + 1);
+					},
+					get: function () {
+						return this._has("bar") ? this._get("bar") : 0;
+					},
+					enumerable: true,
+					configurable: true
+				}),
+				baz: ""
 			});
 
-			var attr1 = new StatefulClass1();
-			attr1.foo = 4;
-			attr1.bar = 2;
-			attr1.baz = "bar";
+			var instance = new StatefulClass1();
+			instance.foo = 4;
+			instance.bar = 2;
+			instance.baz = "bar";
 
-			assert.strictEqual(attr1.foo, 3, "attr1.foo getter works");
-			assert.strictEqual(attr1.bar, 3, "attr1.bar setter works");
-			assert.strictEqual(attr1.baz, "bar", "attribute set properly");
+			assert.strictEqual(instance.foo, 3, "instance.foo getter works");
+			assert.strictEqual(instance.bar, 3, "instance.bar setter works");
+			assert.strictEqual(instance.baz, "bar", "attribute set properly");
+
+			// Make sure that prototype itself wasn't modified, only the instance.
+			var instance2 = new StatefulClass1();
+			assert.strictEqual(instance2.baz, "", "prototype.baz wasn't modified");
 		},
+
 		"paramHandling": function () {
-			var StatefulClass2 = dcl(Stateful, {
-				foo: null,
-				bar: 5,
-
-				_setFooAttr: function (value) {
-					this._set("foo", value);
-				},
-				_setBarAttr: function (value) {
-					this._set("bar", value);
-				}
-			});
-
-			var attr2 = new StatefulClass2({
-				foo: function () {
-					return "baz";
-				},
-				bar: 4
-			});
-
-			assert.strictEqual(typeof attr2.foo, "function", "function attribute set");
-			assert.strictEqual(attr2.foo(), "baz", "function has proper return value");
-			assert.strictEqual(attr2.bar, 4, "attribute has proper value");
-
 			// Check if user overrides widget to not process constructor params
 			var IgnoreParamsStateful = dcl(Stateful, {
 				foo: 3,
@@ -69,46 +62,7 @@ define([
 			var ignore2 = new IgnoreParamsStateful(5, 4, 3, 2, 1);
 			assert.strictEqual(ignore2.foo, 3, "ignore2 created");
 		},
-		"_get": function () {
-			var StatefulClass5 = dcl(Stateful, {
-				foo: "",
-				_getFooAttr: function () {
-					return this._get("foo") + "modified";
-				}
-			});
 
-			var attr5 = new StatefulClass5();
-			assert.strictEqual(attr5.foo, "modified", "value get properly");
-			attr5.foo = "further";
-			assert.strictEqual(attr5.foo, "furthermodified");
-		},
-		"moreCorrelatedProperties": function () {
-			var Widget = dcl(Stateful, {
-				foo: 10,
-				_setFooAttr: function (val) {
-					this._set("foo", val);
-					this._set("bar", val + 1);
-				},
-
-				bar: 11,
-				_setBarAttr: function (val) {
-					this._set("bar", val);
-					this._set("foo", val - 1);
-				}
-			});
-
-			var w1 = new Widget({foo: 30});
-			assert.strictEqual(w1.foo, 30, "w1.foo");
-			assert.strictEqual(w1.bar, 31, "w1.bar");
-
-			var w2 = new Widget({bar: 30});
-			assert.strictEqual(w2.bar, 30, "w2.bar");
-			assert.strictEqual(w2.foo, 29, "w2.foo");
-
-			var w3 = new Widget({});
-			assert.strictEqual(w3.foo, 10, "w3.foo");
-			assert.strictEqual(w3.bar, 11, "w3.bar");
-		},
 		"getSetObserve": function () {
 			var dfd = this.async(1000),
 				count = 0,
@@ -133,6 +87,7 @@ define([
 			s.foo = 4;
 			assert.strictEqual(s.foo, 4);
 		},
+
 		"removeObserveHandleTwice": function () {
 			var dfd = this.async(1000),
 				s = new (dcl(Stateful, {
@@ -159,6 +114,7 @@ define([
 				]);
 			}), 100);
 		},
+
 		"setHash: observe()": function () {
 			var dfd = this.async(1000),
 				s = new (dcl(Stateful, {
@@ -197,19 +153,31 @@ define([
 				}), 100);
 			}), 100);
 		},
-		"_set: observe()": function () {
+
+		"observing custom accessors": function () {
 			var dfd = this.async(1000),
 				StatefulClass4 = dcl(Stateful, {
-					foo: null,
-					bar: null,
-					_setFooAttr: function (value) {
-						this._set("bar", value);
-						this._set("foo", value);
-					},
-					_setBarAttr: function (value) {
-						this._set("foo", value);
-						this._set("bar", value);
-					}
+					foo: dcl.prop({
+						set: function (val) {
+							this._set("foo", val);
+						},
+						get: function () {
+							return this._has("foo") ? this._get("foo") : 0;
+						},
+						enumerable: true,
+						configurable: true
+					}),
+
+					// Alias for foo.
+					bar: dcl.prop({
+						set: function (val) {
+							this.foo = val + 1;
+						},
+						get: function () {
+							return this.foo - 1;
+						},
+						enumerable: false
+					})
 				}),
 				attr4 = new StatefulClass4(),
 				changes = [];
@@ -217,16 +185,19 @@ define([
 				changes.push(oldValues);
 			}));
 			attr4.foo = 3;
-			assert.strictEqual(attr4.bar, 3, "value set properly");
+			assert.strictEqual(attr4.foo, 3, "foo #1");
+			assert.strictEqual(attr4.bar, 2, "bar #1");
 			attr4.bar = 4;
-			assert.strictEqual(attr4.foo, 4, "value set properly");
+			assert.strictEqual(attr4.foo, 5, "foo #2");
+			assert.strictEqual(attr4.bar, 4, "bar #2");
 
 			setTimeout(dfd.callback(function () {
-				assert.deepEqual(changes, [{foo: null, bar: null}]);
+				assert.deepEqual(changes, [{foo: 0}]);
 			}), 100);
 		},
+
 		"subclasses1: observe()": function () {
-			// Test when superclass and subclass are declared first, and afterwards instantiated
+			// Test when superclass and subclass are declared first, and afterwards instantiated.
 			var dfd = this.async(1000),
 				SuperClass = dcl(Stateful, {
 					foo: null,
@@ -257,8 +228,9 @@ define([
 				]);
 			}), 100);
 		},
+
 		"subclasses2: observe()": function () {
-			// Test when superclass is declared and instantiated, then subclass is declared and use later
+			// Test when superclass is declared and instantiated, then subclass is declared and used later.
 			var dfd = this.async(1000),
 				SuperClass = dcl(Stateful, {
 					foo: null,
@@ -272,14 +244,8 @@ define([
 			sup.foo = 5;
 			sup.bar = 6;
 
-			var customSetterCalled,
-				SubClass = dcl(SuperClass, {
-					bar: 5,
-					_setBarAttr: function (val) {
-						// this should get called even though SuperClass doesn't have a custom setter for "bar"
-						customSetterCalled = true;
-						this._set("bar", val);
-					}
+			var SubClass = dcl(SuperClass, {
+					bar: 5
 				}),
 				sub = new SubClass();
 			sub.observe(dfd.rejectOnError(function (oldValues) {
@@ -287,19 +253,21 @@ define([
 			}));
 			sub.foo = 3;
 			sub.bar = 4;
-			assert.ok(customSetterCalled, "SubClass custom setter called");
 
 			setTimeout(dfd.rejectOnError(function () {
 				assert.deepEqual(changes, [
 					{id: "sup", oldValues: {foo: null, bar: null}},
 					{id: "sub", oldValues: {foo: null, bar: 5}}
-				]);
+				], "changes");
+
+				// Changing bar from 6 to 6 doesn't trigger another observe callback.
 				sup.bar = 6;
 				setTimeout(dfd.callback(function () {
-					assert.strictEqual(changes.length, 2);
+					assert.strictEqual(changes.length, 2, "changes.length");
 				}), 100);
 			}), 100);
 		},
+
 		"observe(): Changing some properties while some of them don't yield actual changes": function () {
 			var dfd = this.async(1000),
 				stateful = new (dcl(Stateful, {
@@ -325,6 +293,7 @@ define([
 			stateful.baz = NaN;
 			stateful.quux = -0;
 		},
+
 		"notifyCurrentValue()": function () {
 			var dfd = this.async(1000),
 				stateful = new (dcl(Stateful, {
@@ -342,6 +311,7 @@ define([
 			stateful.notifyCurrentValue("foo", "bar");
 			stateful.notifyCurrentValue("zaz");
 		},
+
 		"Stateful.PropertyListObserver#deliver(), Stateful.PropertyListObserver#discardChanges()": function () {
 			var changes = [],
 				stateful = new (dcl(Stateful, {
@@ -358,6 +328,7 @@ define([
 			hObserve.deliver();
 			assert.deepEqual(changes, [{foo: "Foo1"}]);
 		},
+
 		"Stateful#deliver(), Stateful#discardChanges()": function () {
 			var stateful = new (dcl(Stateful, {
 				foo: undefined,
@@ -387,24 +358,19 @@ define([
 				assert.strictEqual(log, "", "discardChanges()");
 			}), 10);
 		},
+
 		"observe filter": function () {
 			// Check to make sure reported changes are consistent between platforms with and without Object.observe()
 			// native support
 			var dfd = this.async(1000),
-				nop = function () {},
 				stateful = new (dcl(Stateful, {
 					_private: 1,
 
 					foo: 2,
-					_setFooAttr: function (val) {
-						this._set("foo", val);
-					},
 
 					constructor: function () {
 						this.instanceProp = 3;
-					},
-
-					anotherFunc: nop
+					}
 				}))({});
 			stateful.observe(dfd.callback(function (oldValues) {
 				assert.deepEqual(oldValues, {
@@ -414,7 +380,6 @@ define([
 			}));
 			stateful._private = 11;
 			stateful.foo = 22;
-			stateful.anotherFunc = function () { };
 			stateful.instanceProp = 33;
 		},
 
@@ -427,7 +392,8 @@ define([
 				bar: 0,
 				barAlias: dcl.prop({
 					set: function (val) { this.bar = val; },
-					get: function () { return this.bar; }
+					get: function () { return this.bar; },
+					enumerable: false
 				})
 			});
 			var instance1 = new StatefulClass1();
@@ -437,7 +403,7 @@ define([
 			for (var key in instance1) {
 				forEachKeys.push(key);
 			}
-			assert.deepEqual(forEachKeys, ["foo", "bar"], "forEachKeys #1");
+			assert.deepEqual(forEachKeys, ["foo", "bar"], "forEachKeys");
 
 			instance1.observe(dfd.callback(function (oldValues) {
 				assert.deepEqual(oldValues, {
@@ -449,12 +415,12 @@ define([
 			instance1.foo = 1;
 			instance1.barAlias = 1;
 
-			// Make sure that changing foo didn't make the _shadowFooAttr property visible.
-			forEachKeys = [];
-			for (var key in instance1) {
-				forEachKeys.push(key);
+			// Make sure that changing foo didn't make the shadow property visible.
+			var forEachKeys2 = [];
+			for (var key2 in instance1) {
+				forEachKeys2.push(key2);
 			}
-			assert.deepEqual(forEachKeys, ["foo", "bar"], "forEachKeys #2");
+			assert.deepEqual(forEachKeys2, ["foo", "bar"], "forEachKeys2");
 		}
 	});
 });
