@@ -65,7 +65,9 @@ define([
 	 *
 	 * @mixin module:decor/Stateful
 	 */
-	var Stateful = dcl(null, /** @lends module:decor/Stateful# */ {
+	var Stateful = dcl(/** @lends module:decor/Stateful# */ {
+		declaredClass: "decor/Stateful",
+
 		/**
 		 * Returns a hash of properties that should be observed.
 		 * @returns {Object} Hash of properties.

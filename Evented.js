@@ -11,7 +11,9 @@ define(["dcl/dcl", "dcl/advise"], function (dcl, advise) {
 	 * instance.emit("open", {name: "some event", ...});
 	 * @mixin module:decor/Evented
 	 */
-	return dcl(null, /** @lends module:decor/Evented# */ {
+	return dcl(/** @lends module:decor/Evented# */ {
+		declaredClass: "decor/Evented",
+
 		/**
 		 * Setup listener to be called when specified event is fired.
 		 * @param {string} type - Name of event.

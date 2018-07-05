@@ -50,6 +50,8 @@ define([
 	};
 
 	Notifier.prototype = /** @lends module:decor/Notifier */ {
+		declaredClass: "decor/Notifier",
+
 		/**
 		 * Record that specified property has changed.
 		 * It will be notified at the end of microtask, or when deliver() is called.

@@ -13,6 +13,8 @@ define([
 	 * @mixin module:decor/Destroyable
 	 */
 	return dcl(Destroyable, /** @lends module:decor/Destroyable# */ {
+		declaredClass: "decor/Destroyable",
+
 		/**
 		 * Destroy this class, releasing any resources registered via `own()`.
 		 * @method

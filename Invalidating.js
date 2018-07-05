@@ -10,6 +10,8 @@ define([
 	 * @class module:decor/Invalidating
 	 */
 	var Invalidating = dcl([Stateful, Destroyable], /** @lends module:decor/Invalidating# */ {
+		declaredClass: "decor/Invalidating",
+
 		// Call initializeInvalidating() right after class is constructed.  Note though that this code won't run for
 		// custom elements, since they call createdCallback() rather than constructor().
 		// Instead, delite/Widget calls initializeInvalidating() directly.
