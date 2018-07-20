@@ -14,7 +14,7 @@ define([
 	}
 
 	function isObject(obj) {
-		return obj && typeof obj === "object" && !(obj instanceof HTMLElement);
+		return obj && typeof obj === "object" && !(obj instanceof HTMLElement) && !Array.isArray(obj);
 	}
 	// Deep compare oldObj to newObj and call notify() for properties that were changed or added in newObj.
 	function diff(oldObj, newObj, notify, prefix) {

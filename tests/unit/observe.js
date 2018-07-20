@@ -313,10 +313,9 @@ define([
 			setTimeout(dfd.rejectOnError(function () {
 				assert.deepEqual(log, [
 					{
-						"ary.2": 3,
 						foo: "Foo0"
 					}
-				], "change in array element");
+				], "array elements not monitored");
 
 				log = [];
 
