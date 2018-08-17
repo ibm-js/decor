@@ -10,6 +10,9 @@ define([
 			var dfd = this.async(1000),
 				log = [],
 				invalidating = new (dcl(Invalidating, {
+					constructor: dcl.after(function () {
+						this.initializeInvalidating();
+					}),
 					foo: undefined,
 					bar: undefined,
 					computeProperties: function (oldValues) {
@@ -50,6 +53,9 @@ define([
 			var dfd = this.async(1000),
 				cpLog = [], rrLog = [],
 				invalidating = new (dcl(Invalidating, {
+					constructor: dcl.after(function () {
+						this.initializeInvalidating();
+					}),
 					foo: undefined,
 					computeProperties: function (oldValues) {
 						cpLog.push(oldValues);
@@ -81,6 +87,9 @@ define([
 			var dfd = this.async(1000),
 				cpLog = [], rrLog = [],
 				invalidating = new (dcl(Invalidating, {
+					constructor: dcl.after(function () {
+						this.initializeInvalidating();
+					}),
 					foo: undefined,
 					bar: undefined,
 					baz: undefined,
@@ -118,6 +127,9 @@ define([
 		"Synchronous change delivery": function () {
 			var rrLog = [],
 				invalidating = new (dcl(Invalidating, {
+					constructor: dcl.after(function () {
+						this.initializeInvalidating();
+					}),
 					foo: undefined,
 					bar: undefined,
 					computeProperties: function () {
@@ -144,6 +156,9 @@ define([
 			var dfd = this.async(1000),
 				rrCalls = 0,
 				invalidating = new (dcl(Invalidating, {
+					constructor: dcl.after(function () {
+						this.initializeInvalidating();
+					}),
 					foo: undefined,
 					refreshRendering: function () {
 						rrCalls ++;
@@ -163,6 +178,9 @@ define([
 			var dfd = this.async(1000),
 				log = [],
 				invalidating = new (dcl(Invalidating, {
+					constructor: dcl.after(function () {
+						this.initializeInvalidating();
+					}),
 					foo: undefined,
 					bar: undefined,
 					template: undefined,

@@ -28,6 +28,7 @@ Note that in order to be subject to invalidation the corresponding property must
 Note that any property subject to compute properties phase will also be subject to the refresh rendering phase in a
 second phase.
 
+
 <a name="changes"></a>
 ## Changes Lifecycle
 
@@ -50,7 +51,8 @@ leading to better performance by making sure the rendering is not modified sever
 <a name="startup"></a>
 ## Startup Lifecycle
 
-`decor/Invalidating` has an `initializeRendering()` method that it calls on startup, in order to do the initial
+The delite/Widget subclass must call `initializeInvalidating()` from the `connectedCallback()` method.
+That will make `decor/Invalidating` call `initializeRendering()`, in order to do the initial
 rendering of the DOM.
 It also calls `computeProperties(this, true)` and `refreshRendering(this, true)`
 since those methods tend to have code that is useful for the initial rendering in addition to responding to changes.
@@ -74,9 +76,14 @@ This can be done by redefining the `computeProperties()`, `initializeRendering()
 Both `computeProperties()` and `refreshRendering()` take as parameter a hash object which contains the name of the
 properties that have triggered the refresh action.  This is particularly useful when several properties are involved.
 
+This is an example of using Invalidating stand alone, rather than from delite/Widget:
+
 ```js
 define(["dcl/dcl", "decor/Invalidating"/*, ...*/], function (dcl, Invalidating/*, ...*/) {
   return dcl(Invalidating, {
+    constructor: dcl.after(function () {
+      this.initializeInvalidating();
+    }),
     a: true,
     b: "value",
     computeProperties: function (oldValues) {
