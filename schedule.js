@@ -16,15 +16,21 @@ define(["./features"], function (has) {
 		callbacks = {},
 		pseudoDiv = has("mutation-observer-api") && document.createElement("div");
 	function runCallbacks() {
-		for (var anyWorkDone = true; anyWorkDone;) {
+		var anyWorkDone;
+		do {
 			anyWorkDone = false;
 			for (var id in callbacks) {
 				var callback = callbacks[id];
 				delete callbacks[id];
-				callback();
+				try {
+					callback();
+				} catch (e) {
+					// An error in one callback shouldn't prevent the others from running.
+					console.error("decor/schedule: exception", e, "in callback", callback);
+				}
 				anyWorkDone = true;
 			}
-		}
+		} while (anyWorkDone);
 		inFlight = false;
 	}
 	if (has("mutation-observer-api")) {

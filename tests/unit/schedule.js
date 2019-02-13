@@ -58,6 +58,22 @@ define([
 			setTimeout(dfd.callback(function () {
 				assert.strictEqual(count, 2);
 			}), 100);
+		},
+		"Schedule multiple tasks at once": function () {
+			var log = [];
+			schedule(function () {
+				log.push("a");
+
+				// Check that throwing an error doesn't interrupt the next callback;
+				throw new Error("Intentional exception for testing");
+			});
+			schedule(function () {
+				log.push("b");
+			});
+			var dfd = this.async(1000);
+			setTimeout(dfd.callback(function () {
+				assert.deepEqual(log, ["a", "b"]);
+			}), 10);
 		}
 	});
 });
