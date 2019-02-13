@@ -18,7 +18,8 @@ define([
 
 	// Deliver all pending change notifications in the order that the callbacks were registered.
 	function deliverAllByTimeout() {
-		for (var anyWorkDone = true; anyWorkDone;) {
+		var anyWorkDone;
+		do {
 			anyWorkDone = false;
 
 			// Observation may stop during observer callback
@@ -33,10 +34,15 @@ define([
 			});
 
 			for (var i = 0, l = callbacks.length; i < l; ++i) {
-				callbacks[i].deliver();
+				try {
+					callbacks[i].deliver();
+				} catch (e) {
+					// An error in one callback shouldn't prevent the others from running.
+					console.error("decor/Notifier: exception", e, "calling deliver() on", callbacks[i]);
+				}
 				anyWorkDone = true;
 			}
-		}
+		} while (anyWorkDone);
 		deliverHandle = null;
 	}
 

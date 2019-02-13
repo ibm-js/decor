@@ -7,6 +7,34 @@ define([
 	registerSuite({
 		name: "Stateful",
 
+		"observe": function () {
+			var StatefulClass1 = dcl(Stateful, {
+				foo: 1,
+				bar: 2
+			});
+
+			var log = [];
+			var oldValsLog = [];
+			var instance = new StatefulClass1();
+			instance.observe(function callback1(oldVals) {
+				log.push("a");
+				oldValsLog.push(oldVals);
+				throw new Error("Intentional exception for testing");
+			});
+			instance.observe(function callback2(oldVals) {
+				log.push("b");
+				oldValsLog.push(oldVals);
+			});
+			instance.foo = 3;
+			instance.bar = 4;
+
+			var dfd = this.async(1000);
+			setTimeout(dfd.callback(function () {
+				assert.deepEqual(log, ["a", "b"], "log");
+				assert.deepEqual(oldValsLog, [{foo: 1, bar: 2}, {foo: 1, bar: 2}], "oldValsLog");
+			}), 10);
+		},
+
 		"accessors": function () {
 			var StatefulClass1 = dcl(Stateful, {
 				foo: dcl.prop({
