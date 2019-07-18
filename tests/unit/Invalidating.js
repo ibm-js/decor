@@ -1,11 +1,12 @@
-define([
-	"intern!object",
-	"intern/chai!assert",
-	"decor/Invalidating",
-	"dcl/dcl"
-], function (registerSuite, assert, Invalidating, dcl) {
-	registerSuite({
-		name: "Invalidating",
+define(function (require) {
+	"use strict";
+
+	var registerSuite = intern.getPlugin("interface.object").registerSuite;
+	var assert = intern.getPlugin("chai").assert;
+	var Invalidating = require("decor/Invalidating");
+	var dcl = require("dcl/dcl");
+
+	registerSuite("Invalidating", {
 		"Basic": function () {
 			var dfd = this.async(1000),
 				log = [],
@@ -49,6 +50,7 @@ define([
 				assert.deepEqual(log[1].oldValues, {foo: "Foo0", bar: "Bar0"}, "changes");
 			}), 5);
 		},
+
 		"Property validation": function () {
 			var dfd = this.async(1000),
 				cpLog = [], rrLog = [],
@@ -83,6 +85,7 @@ define([
 				assert.deepEqual(rrLog[1], {foo: 1}, "second refreshRendering() value");
 			}), 5);
 		},
+
 		"Computed property": function () {
 			var dfd = this.async(1000),
 				cpLog = [], rrLog = [],
@@ -124,6 +127,7 @@ define([
 				assert.strictEqual(invalidating.baz, "Baz0");
 			}), 5);
 		},
+
 		"Synchronous change delivery": function () {
 			var rrLog = [],
 				invalidating = new (dcl(Invalidating, {
@@ -152,6 +156,7 @@ define([
 			assert.strictEqual(rrLog.length, 2, "deliverComputing() triggered another call to refreshRendering()");
 			assert.deepEqual(rrLog[1], {foo: "Foo0", bar: "Bar0"});
 		},
+
 		"Discard changes": function () {
 			var dfd = this.async(1000),
 				rrCalls = 0,
@@ -174,6 +179,7 @@ define([
 				assert.strictEqual(rrCalls, 1, "refreshRendering() not called again due to discardChanges()");
 			}), 5);
 		},
+
 		"shouldInitializeRendering()": function () {
 			var dfd = this.async(1000),
 				log = [],

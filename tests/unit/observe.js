@@ -1,15 +1,15 @@
-define([
-	"intern!object",
-	"intern/chai!assert",
-	"dcl/dcl",
-	"decor/observe",
-	"decor/Stateful"
-], function (registerSuite, assert, dcl, observe, Stateful) {
+define(function (require) {
+	"use strict";
+
+	var registerSuite = intern.getPlugin("interface.object").registerSuite;
+	var assert = intern.getPlugin("chai").assert;
+	var dcl = require("dcl/dcl");
+	var observe = require("decor/observe");
+	var Stateful = require("decor/Stateful");
+
 	var handles = [];
 
-	registerSuite({
-		name: "observe",
-
+	registerSuite("observe", {
 		"basic": function () {
 			var dfd = this.async(1000);
 			var pojo = {

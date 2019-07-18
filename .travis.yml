@@ -10,9 +10,6 @@ install:
   - npm -g install grunt-cli
   - npm install
   - yes | bower install
-  - cd node_modules/intern
-  - npm install
-  - cd ../..
 script:
   - grunt jshint
-  - grunt test:remote
+  - npx intern config=@sauce

@@ -1,22 +1,24 @@
-define([
-	"intern!bdd",
-	"intern/chai!expect",
-	"../../Observable",
-	"../../features",
-	"../../ObservableArray"
-], function (bdd, expect, Observable, has, ObservableArray) {
-	/* jshint withstmt: true */
-	/* global describe, afterEach, it */
-	with (bdd) {
-		describe("ObservableArray", function () {
-			var handles = [],
-				baseData = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-			afterEach(function () {
-				for (var handle = null; (handle = handles.shift());) {
-					handle.remove();
-				}
-			});
-			it("ObservableArray as constructor or as function", function () {
+define(function (require) {
+	var registerSuite = intern.getPlugin("interface.object").registerSuite;
+	var expect = intern.getPlugin("chai").expect;
+	var Observable = require("decor/Observable");
+	var has = require("decor/features");
+	var ObservableArray = require("decor/ObservableArray");
+
+	var handles = [],
+		baseData = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+
+	/*jshint maxlen: 140*/
+
+	registerSuite("ObservableArray", {
+		afterEach: function () {
+			for (var handle = null; (handle = handles.shift());) {
+				handle.remove();
+			}
+		},
+
+		tests: {
+			"ObservableArray as constructor or as function": function () {
 				/* jshint newcap: false */
 				var a = baseData.slice(),
 					observableArray = ObservableArray.apply(undefined, baseData);
@@ -39,8 +41,9 @@ define([
 				expect(ObservableArray.apply(observableArray, new ObservableArray(3)))
 					.to.deep.equal([undefined, undefined, undefined]);
 				expect(observableArray).to.deep.equal(baseData);
-			});
-			it("Observable.observe() with push()/pop()/shift()/unshift() to ObservableArray instance", function () {
+			},
+
+			"Observable.observe() with push()/pop()/shift()/unshift() to ObservableArray instance": function () {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -79,8 +82,9 @@ define([
 				observableArray.pop();
 				observableArray.unshift("0", "1");
 				observableArray.shift();
-			});
-			it("Observing for array length", function () {
+			},
+
+			"Observing for array length": function () {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -142,8 +146,9 @@ define([
 				})));
 				observableArray.push("k", "l");
 				observableArray.pop();
-			});
-			it("Observable.observe() with reverse() to ObservableArray instance", function () {
+			},
+
+			"Observable.observe() with reverse() to ObservableArray instance": function () {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -223,10 +228,11 @@ define([
 					}
 				}), ["update", "splice"]));
 				observableArray.reverse();
-			});
+			},
+
 			// ECMAScript Object.observe() emits change records for every internal change in sort().
 			// Let ObservableArray.observe() squash it for this test case.
-			it("ObservableArray.observe() with sort() to ObservableArray instance", function () {
+			"ObservableArray.observe() with sort() to ObservableArray instance": function () {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(ObservableArray.observe(observableArray, dfd.callback(function (records) {
@@ -241,8 +247,9 @@ define([
 					]);
 				})));
 				observableArray.sort(function (dst, src) { return src.charCodeAt(0) - dst.charCodeAt(0); });
-			});
-			it("Observable.observe() with setting entries to ObservableArray instance: Basic", function () {
+			},
+
+			"Observable.observe() with setting entries to ObservableArray instance: Basic": function () {
 				var dfd = this.async(1000),
 					observableArray = new ObservableArray();
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -293,9 +300,9 @@ define([
 				observableArray.set(2, "c");
 				observableArray.set(1, "B");
 				observableArray.set(4, "e");
-			});
-			it("Observable.observe() with setting entries to ObservableArray instance: " +
-			"Making array sparse", function () {
+			},
+
+			"Observable.observe() with setting entries to ObservableArray instance: Making array sparse": function () {
 				var dfd = this.async(1000),
 					observableArray = new ObservableArray();
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -315,9 +322,9 @@ define([
 					"splice"
 				]));
 				observableArray.set(2, "c");
-			});
-			it("Observable.observe() with setting entries to ObservableArray instance: " +
-			"Setting an entry to a sparse array", function () {
+			},
+
+			"Observable.observe() with setting entries to ObservableArray instance: Setting an entry to a sparse array": function () {
 				var dfd = this.async(1000),
 					observableArray = new ObservableArray(3);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -335,9 +342,9 @@ define([
 					"splice"
 				]));
 				observableArray.set(1, "b");
-			});
-			it("Observable.observe() with making the length of an ObservableArray instance " +
-			"bigger or smaller", function () {
+			},
+
+			"Observable.observe() with making the length of an ObservableArray instance bigger or smaller": function () {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
@@ -365,9 +372,9 @@ define([
 				]));
 				observableArray.set("length", 7);
 				observableArray.set("length", 12);
-			});
-			it("ObservableArray.observe() with making the length of an ObservableArray instance " +
-			"bigger or smaller", function () {
+			},
+
+			"ObservableArray.observe() with making the length of an ObservableArray instance bigger or smaller": function () {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(ObservableArray.observe(observableArray, dfd.callback(function (splices) {
@@ -383,8 +390,9 @@ define([
 				})));
 				observableArray.set("length", 7);
 				observableArray.set("length", 12);
-			});
-			it("ObservableArray.observe() with two sequential pushes", function () {
+			},
+
+			"ObservableArray.observe() with two sequential pushes": function () {
 				var dfd = this.async(100),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(ObservableArray.observe(observableArray, dfd.callback(function (splices) {
@@ -400,8 +408,9 @@ define([
 				})));
 				observableArray.push("k");
 				observableArray.push("l");
-			});
-			it("ObservableArray.observe() with setting entries to ObservableArray instance: Basic", function () {
+			},
+
+			"ObservableArray.observe() with setting entries to ObservableArray instance: Basic": function () {
 				var dfd = this.async(1000),
 					observableArray = new ObservableArray();
 				handles.push(ObservableArray.observe(observableArray, dfd.callback(function (splices) {
@@ -420,9 +429,9 @@ define([
 				observableArray.set(2, "c");
 				observableArray.set(1, "B");
 				observableArray.set(3, "d");
-			});
-			it("ObservableArray.observe() with setting entries to ObservableArray instance: " +
-			"Setting an entry to a sparse array", function () {
+			},
+
+			"ObservableArray.observe() with setting entries to ObservableArray instance: Setting an entry to a sparse array": function () {
 				var dfd = this.async(1000),
 					observableArray = new ObservableArray(3);
 				handles.push(ObservableArray.observe(observableArray, dfd.callback(function (splices) {
@@ -442,8 +451,9 @@ define([
 					"splice"
 				]));
 				observableArray.set(1, "b");
-			});
-			it("ObservableArray.observe() with two splices: Second index is bigger, no intersection", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second index is bigger, no intersection": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f", "g"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "A", "B", "C", "h", "i", "j"]
@@ -472,8 +482,9 @@ define([
 				})));
 				observableArray.splice(3, 4, "A", "B", "C");
 				observableArray.splice(7, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: Second index is bigger, adjacent", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second index is bigger, adjacent": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f", "g"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "A", "B", "C", "h", "i", "j"]
@@ -495,8 +506,9 @@ define([
 				})));
 				observableArray.splice(3, 4, "A", "B", "C");
 				observableArray.splice(6, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: Second index is bigger, intersects", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second index is bigger, intersects": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f", "g"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "A", "B", "C", "h", "i", "j"]
@@ -518,9 +530,9 @@ define([
 				})));
 				observableArray.splice(3, 4, "A", "B", "C");
 				observableArray.splice(5, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: " +
-			"First splice range contains second splice range", function () {
+			},
+
+			"ObservableArray.observe() with two splices: First splice range contains second splice range": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f"], added: ["A", "B", "C", "D"]}
 				// ["a", "b", "c", "A", "B", "C", "D", "g", "h", "i", "j"]
@@ -542,8 +554,9 @@ define([
 				})));
 				observableArray.splice(3, 3, "A", "B", "C", "D");
 				observableArray.splice(4, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: Second index is smaller, no intersection", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second index is smaller, no intersection": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 4, removed: ["e", "f"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "d", "A", "B", "C", "g", "h", "i", "j"]
@@ -572,8 +585,9 @@ define([
 				})));
 				observableArray.splice(4, 2, "A", "B", "C");
 				observableArray.splice(1, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: Second index is smaller, adjacent", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second index is smaller, adjacent": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 4, removed: ["e", "f"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "d", "A", "B", "C", "g", "h", "i", "j"]
@@ -595,8 +609,9 @@ define([
 				})));
 				observableArray.splice(4, 2, "A", "B", "C");
 				observableArray.splice(2, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: Second index is smaller, intersects", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second index is smaller, intersects": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 4, removed: ["e", "f"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "d", "A", "B", "C", "g", "h", "i", "j"]
@@ -618,9 +633,9 @@ define([
 				})));
 				observableArray.splice(4, 2, "A", "B", "C");
 				observableArray.splice(3, 2, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with two splices: " +
-			"Second splice range contains first splice range", function () {
+			},
+
+			"ObservableArray.observe() with two splices: Second splice range contains first splice range": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 4, removed: ["e", "f"], added: ["A", "B", "C"]}
 				// ["a", "b", "c", "d", "A", "B", "C", "g", "h", "i", "j"]
@@ -642,9 +657,9 @@ define([
 				})));
 				observableArray.splice(4, 2, "A", "B", "C");
 				observableArray.splice(3, 5, "0", "1", "2");
-			});
-			it("ObservableArray.observe() with three splices: " +
-			"Third is adjacent with first but not with second", function () {
+			},
+
+			"ObservableArray.observe() with three splices: Third is adjacent with first but not with second": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f"], added: ["A", "B"]}
 				// ["a", "b", "c", "A", "B", "g", "h", "i", "j"]
@@ -678,9 +693,9 @@ define([
 				observableArray.splice(3, 3, "A", "B");
 				observableArray.splice(7, 2, "0", "1", "2");
 				observableArray.splice(5, 1, "x", "y");
-			});
-			it("ObservableArray.observe() with three splices: " +
-			"Third is adjacent with second but not with first", function () {
+			},
+
+			"ObservableArray.observe() with three splices: Third is adjacent with second but not with first": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f"], added: ["A", "B"]}
 				// ["a", "b", "c", "A", "B", "g", "h", "i", "j"]
@@ -714,8 +729,9 @@ define([
 				observableArray.splice(3, 3, "A", "B");
 				observableArray.splice(7, 2, "0", "1", "2");
 				observableArray.splice(6, 1, "x", "y");
-			});
-			it("ObservableArray.observe() with three splices: Third is adjacent with first and second", function () {
+			},
+
+			"ObservableArray.observe() with three splices: Third is adjacent with first and second": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 3, removed: ["d", "e", "f"], added: ["A", "B"]}
 				// ["a", "b", "c", "A", "B", "g", "h", "i", "j"]
@@ -741,8 +757,9 @@ define([
 				observableArray.splice(3, 3, "A", "B");
 				observableArray.splice(7, 2, "0", "1", "2");
 				observableArray.splice(5, 2, "x", "y", "z");
-			});
-			it("ObservableArray.observe() with three splices: First contains second and third", function () {
+			},
+
+			"ObservableArray.observe() with three splices: First contains second and third": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 1, removed: ["b", "c", "d", "e", "f", "g", "h", "i"],
 				// 			added: ["A", "B", "C", "D", "E", "F", "G"]}
@@ -769,8 +786,9 @@ define([
 				observableArray.splice(1, 8, "A", "B", "C", "D", "E", "F", "G");
 				observableArray.splice(2, 2, "0", "1", "2");
 				observableArray.splice(6, 2, "x", "y", "z");
-			});
-			it("ObservableArray.observe() with three splices: Second contains first and third", function () {
+			},
+
+			"ObservableArray.observe() with three splices: Second contains first and third": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 2, removed: ["c", "d", "e"], added: ["A", "B"]}
 				// ["a", "b", "A", "B", "f", "g", "h", "i", "j"]
@@ -796,8 +814,9 @@ define([
 				observableArray.splice(2, 3, "A", "B");
 				observableArray.splice(1, 7, "0", "1", "2", "3");
 				observableArray.splice(2, 2, "x", "y", "z");
-			});
-			it("ObservableArray.observe() with three splices: Third contains first and second", function () {
+			},
+
+			"ObservableArray.observe() with three splices: Third contains first and second": function () {
 				// ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 				// SPLICE: {index: 2, removed: ["c", "d", "e"], added: ["A", "B"]}
 				// ["a", "b", "A", "B", "f", "g", "h", "i", "j"]
@@ -822,7 +841,7 @@ define([
 				observableArray.splice(2, 3, "A", "B");
 				observableArray.splice(5, 2, "0", "1", "2");
 				observableArray.splice(1, 8, "x", "y", "z");
-			});
-		});
-	}
+			}
+		}
+	});
 });

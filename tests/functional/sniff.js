@@ -1,21 +1,17 @@
-define(["intern",
-	"intern!object",
-	"intern/dojo/node!leadfoot/helpers/pollUntil",
-	"intern/chai!assert",
-	"require"
-], function (intern, registerSuite, pollUntil, assert, require) {
-	var PAGE = "./sniff.html";
+define(function (require) {
+	"use strict";
 
-	registerSuite({
-		name: "Sniff tests",
-		setup: function () {},
+	var registerSuite = intern.getPlugin("interface.object").registerSuite;
+	var pollUntil = require("@theintern/leadfoot/helpers/pollUntil").default;
+	var assert = intern.getPlugin("chai").assert;
 
+	registerSuite("Sniff tests", {
 		"Checking browser and platform sniffing": function () {
 			var remote = this.remote;
 			return remote
-				.get(require.toUrl(PAGE))
+				.get(require.toUrl("decor/tests/functional/sniff.html"))
 				.then(pollUntil("return ('ready' in window && ready) ? true : null;", [],
-						intern.config.WAIT_TIMEOUT, intern.config.POLL_INTERVAL))
+					intern.config.WAIT_TIMEOUT, intern.config.POLL_INTERVAL))
 				.execute("return _has")
 				.then(function (has) {
 					var browserName = remote.environmentType.browserName,

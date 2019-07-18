@@ -1,10 +1,12 @@
 {
 	"name": "decor",
 	"version": "0.7.0",
-	"dependencies": {},
+	"dependencies": {
+		"npm": "^6.4.0"
+	},
 	"devDependencies": {
 		"jshint": "~2.5.1",
-		"intern": "3.4.x",
+		"intern": "4.4.x",
 		"leadfoot": "1.x",
 		"grunt": "~0.4.2",
 		"grunt-contrib-jshint": "~0.6.3",

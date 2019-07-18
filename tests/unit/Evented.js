@@ -1,11 +1,12 @@
-define([
-	"intern!object",
-	"intern/chai!assert",
-	"dcl/dcl",
-	"decor/Evented"
-], function (registerSuite, assert, dcl, Evented) {
-	registerSuite({
-		name: "Evented",
+define(function (require) {
+	"use strict";
+
+	var registerSuite = intern.getPlugin("interface.object").registerSuite;
+	var assert = intern.getPlugin("chai").assert;
+	var dcl = require("dcl/dcl");
+	var Evented = require("decor/Evented");
+
+	registerSuite("Evented", {
 		basic: function () {
 			var MyClass = dcl(Evented, {});
 			var myObject = new MyClass();

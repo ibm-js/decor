@@ -1,12 +1,12 @@
-define([
-	"intern!object",
-	"intern/chai!assert",
-	"../../Stateful",
-	"dcl/dcl"
-], function (registerSuite, assert, Stateful, dcl) {
-	registerSuite({
-		name: "Stateful",
+define(function (require) {
+	"use strict";
 
+	var registerSuite = intern.getPlugin("interface.object").registerSuite;
+	var assert = intern.getPlugin("chai").assert;
+	var Stateful = require("../../Stateful");
+	var dcl = require("dcl/dcl");
+
+	registerSuite("Stateful", {
 		"observe": function () {
 			var StatefulClass1 = dcl(Stateful, {
 				foo: 1,
