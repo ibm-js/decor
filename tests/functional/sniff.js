@@ -15,14 +15,14 @@ define(function (require) {
 				.execute("return _has")
 				.then(function (has) {
 					var browserName = remote.environmentType.browserName,
-						platform = remote.environmentType.platform,
+						platform = remote.environmentType.platformName,
 						deviceName = remote.environmentType.deviceName;
 
 					// Check platform flags.
 					if (/mac/i.test(platform) && browserName !== "iOS") {
-						assert(has.mac, "has(mac) set");
+						assert(has.mac, "has(mac) set, platform = " + platform);
 					} else {
-						assert.isFalse(has.mac, "has(mac) not set");
+						assert.isFalse(has.mac, "has(mac) not set, platform = " + platform);
 					}
 
 					// Check browser flags.
