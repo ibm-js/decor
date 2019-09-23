@@ -2,7 +2,6 @@ define(function (require) {
 	var registerSuite = intern.getPlugin("interface.object").registerSuite;
 	var expect = intern.getPlugin("chai").expect;
 	var Observable = require("decor/Observable");
-	var has = require("decor/features");
 	var ObservableArray = require("decor/ObservableArray");
 
 	var handles = [],
@@ -88,61 +87,22 @@ define(function (require) {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
-					if (has("object-observe-api")) {
-						expect(records).to.deep.equal([
-							{
-								type: "add",
-								object: observableArray,
-								name: "10"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "length",
-								oldValue: 10
-							},
-							{
-								type: "add",
-								object: observableArray,
-								name: "11"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "length",
-								oldValue: 11
-							},
-							{
-								type: "delete",
-								object: observableArray,
-								name: "11",
-								oldValue: "l"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "length",
-								oldValue: 12
-							}
-						]);
-					} else {
-						// Shim part of ObservableArray does not emit change records for array indices
-						// as doing so will be heavy
-						expect(records).to.deep.equal([
-							{
-								type: "update",
-								object: observableArray,
-								name: "length",
-								oldValue: 10
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "length",
-								oldValue: 12
-							}
-						]);
-					}
+					// Shim part of ObservableArray does not emit change records for array indices
+					// as doing so will be heavy
+					expect(records).to.deep.equal([
+						{
+							type: "update",
+							object: observableArray,
+							name: "length",
+							oldValue: 10
+						},
+						{
+							type: "update",
+							object: observableArray,
+							name: "length",
+							oldValue: 12
+						}
+					]);
 				})));
 				observableArray.push("k", "l");
 				observableArray.pop();
@@ -152,80 +112,15 @@ define(function (require) {
 				var dfd = this.async(1000),
 					observableArray = ObservableArray.apply(undefined, baseData);
 				handles.push(Observable.observe(observableArray, dfd.callback(function (records) {
-					if (has("object-observe-api")) {
-						expect(records.sort(function (dst, src) { return dst.name - src.name; })).to.deep.equal([
-							{
-								type: "update",
-								object: observableArray,
-								name: "0",
-								oldValue: "a"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "1",
-								oldValue: "b"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "2",
-								oldValue: "c"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "3",
-								oldValue: "d"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "4",
-								oldValue: "e"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "5",
-								oldValue: "f"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "6",
-								oldValue: "g"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "7",
-								oldValue: "h"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "8",
-								oldValue: "i"
-							},
-							{
-								type: "update",
-								object: observableArray,
-								name: "9",
-								oldValue: "j"
-							}
-						]);
-					} else {
-						expect(records).to.deep.equal([
-							{
-								type: "splice",
-								object: observableArray,
-								index: 0,
-								removed: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
-								addedCount: 10
-							}
-						]);
-					}
+					expect(records).to.deep.equal([
+						{
+							type: "splice",
+							object: observableArray,
+							index: 0,
+							removed: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+							addedCount: 10
+						}
+					]);
 				}), ["update", "splice"]));
 				observableArray.reverse();
 			},

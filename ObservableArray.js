@@ -28,53 +28,35 @@ define([
 	(function () {
 		var observableArrayMarker = "_observableArray";
 
-		if (has("object-observe-api")) {
-			// For useNative case, make ObservableArray an instance of Array instead of an inheritance,
-			// so that Array.observe() emits splices for .length update
-			ObservableArray = function (length) {
-				var self = [];
+		// TODO(asudoh):
+		// Document that ObservableArray cannot be observed by Observable.observe()
+		// without "splice" in accept list.
+		// We need to create large amount of change records to do so,
+		// when splice happens with large amount of removals/adds
+		ObservableArray = function (length) {
+			var beingConstructed = this && !REGEXP_GLOBAL_OBJECT.test(this) && !this.hasOwnProperty("length"),
+				// If this is called as regular function (instead of constructor), work with a new instance
+				self = beingConstructed ? [] : new ObservableArray();
+			if (beingConstructed) {
 				Observable.call(self);
 				// Make ObservableArray marker not enumerable, configurable or writable
 				defineProperty(self, observableArrayMarker, {value: 1});
-				defineProperty(self, "set", Object.getOwnPropertyDescriptor(Observable.prototype, "set"));
-				if (typeof length === "number" && arguments.length === 1) {
-					self.length = length;
-				} else {
-					EMPTY_ARRAY.push.apply(self, arguments);
+				// Make those methods not enumerable
+				for (var s in augmentedMethods) {
+					defineProperty(self, s, {
+						value: augmentedMethods[s],
+						configurable: true,
+						writable: true
+					});
 				}
-				return self;
-			};
-		} else {
-			// TODO(asudoh):
-			// Document that ObservableArray cannot be observed by Observable.observe()
-			// without "splice" in accept list.
-			// We need to create large amount of change records to do so,
-			// when splice happens with large amount of removals/adds
-			ObservableArray = function (length) {
-				var beingConstructed = this && !REGEXP_GLOBAL_OBJECT.test(this) && !this.hasOwnProperty("length"),
-					// If this is called as regular function (instead of constructor), work with a new instance
-					self = beingConstructed ? [] : new ObservableArray();
-				if (beingConstructed) {
-					Observable.call(self);
-					// Make ObservableArray marker not enumerable, configurable or writable
-					defineProperty(self, observableArrayMarker, {value: 1});
-					// Make those methods not enumerable
-					for (var s in augmentedMethods) {
-						defineProperty(self, s, {
-							value: augmentedMethods[s],
-							configurable: true,
-							writable: true
-						});
-					}
-				}
-				if (typeof length === "number" && arguments.length === 1) {
-					self.length = length;
-				} else {
-					EMPTY_ARRAY.push.apply(self, arguments);
-				}
-				return self;
-			};
-		}
+			}
+			if (typeof length === "number" && arguments.length === 1) {
+				self.length = length;
+			} else {
+				EMPTY_ARRAY.push.apply(self, arguments);
+			}
+			return self;
+		};
 
 		/**
 		 * @method module:decor/ObservableArray.test
@@ -92,168 +74,160 @@ define([
 	 * @returns {boolean}
 	 *     true if o can be observed with {@link module:decor/ObservableArray.observe ObservableArray.observe()}.
 	 */
-	if (has("object-observe-api")) {
-		ObservableArray.canObserve = function (a) {
-			return typeof (a || {}).splice === "function";
-		};
-	} else {
-		ObservableArray.canObserve = ObservableArray.test;
-	}
+	ObservableArray.canObserve = ObservableArray.test;
 
-	if (!has("object-observe-api")) {
-		(function () {
-			/**
-			 * Adds and/or removes elements from an array
-			 * and automatically emits a change record compatible
-			 * with {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
-			 * @param {number} index Index at which to start changing the array.
-			 * @param {number} removeCount [An integer indicating the number of old array elements to remove.
-			 * @param {...Anything} [var_args] The elements to add to the array.
-			 * @return {Array} An array containing the removed elements.
-			 * @memberof module:decor/ObservableArray#
-			 */
-			function splice(index, removeCount) {
-				/* jshint validthis: true */
-				if (index < 0) {
-					index = this.length + index;
-				}
-				var oldLength = this.length,
-					changeRecord = {
-						index: index,
-						removed: this.slice(index, index + removeCount),
-						addedCount: arguments.length - 2
-					},
-					result = EMPTY_ARRAY.splice.apply(this, arguments),
-					lengthRecord = oldLength !== this.length && {
-						type: "update",
-						object: this,
-						name: "length",
-						oldValue: oldLength
-					},
-					notifier = Observable.getNotifier(this);
-				notifier.performChange("splice", function () {
-					lengthRecord && notifier.notify(lengthRecord);
-					return changeRecord;
-				});
-				return result;
+	(function () {
+		/**
+		 * Adds and/or removes elements from an array
+		 * and automatically emits a change record compatible
+		 * with {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
+		 * @param {number} index Index at which to start changing the array.
+		 * @param {number} removeCount [An integer indicating the number of old array elements to remove.
+		 * @param {...Anything} [var_args] The elements to add to the array.
+		 * @return {Array} An array containing the removed elements.
+		 * @memberof module:decor/ObservableArray#
+		 */
+		function splice(index, removeCount) {
+			/* jshint validthis: true */
+			if (index < 0) {
+				index = this.length + index;
 			}
-
-			augmentedMethods = /** @lends module:decor/ObservableArray# */ {
-				splice: splice,
-
-				/**
-				 * Sets a value and automatically emits change record(s)
-				 * compatible with
-				 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
-				 * @param {string} name The property name.
-				 * @param value The property value.
-				 * @returns The value set.
-				 */
-				set: function (name, value) {
-					var args;
-					if (name === "length") {
-						args = new Array(Math.max(value - this.length, 0));
-						args.unshift(Math.min(this.length, value), Math.max(this.length - value, 0));
-						splice.apply(this, args);
-					} else if (!isNaN(name) && +name >= this.length) {
-						args = new Array(name - this.length);
-						args.push(value);
-						args.unshift(this.length, 0);
-						splice.apply(this, args);
-					} else {
-						Observable.prototype.set.call(this, name, value);
-					}
-					return value;
+			var oldLength = this.length,
+				changeRecord = {
+					index: index,
+					removed: this.slice(index, index + removeCount),
+					addedCount: arguments.length - 2
 				},
-
-				/**
-				 * Removes the last element from an array
-				 * and automatically emits a change record compatible with
-				 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
-				 * @returns The element removed.
-				 */
-				pop: function () {
-					return splice.call(this, -1, 1)[0];
+				result = EMPTY_ARRAY.splice.apply(this, arguments),
+				lengthRecord = oldLength !== this.length && {
+					type: "update",
+					object: this,
+					name: "length",
+					oldValue: oldLength
 				},
+				notifier = Observable.getNotifier(this);
+			notifier.performChange("splice", function () {
+				lengthRecord && notifier.notify(lengthRecord);
+				return changeRecord;
+			});
+			return result;
+		}
 
-				/**
-				 * Adds one or more elements to the end of an array
-				 * and automatically emits a change record compatible with
-				 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
-				 * @param {...Anything} var_args The elements to add to the end of the array.
-				 * @returns The new length of the array.
-				 */
-				push: function () {
-					var args = [this.length, 0];
-					EMPTY_ARRAY.push.apply(args, arguments);
+		augmentedMethods = /** @lends module:decor/ObservableArray# */ {
+			splice: splice,
+
+			/**
+			 * Sets a value and automatically emits change record(s)
+			 * compatible with
+			 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
+			 * @param {string} name The property name.
+			 * @param value The property value.
+			 * @returns The value set.
+			 */
+			set: function (name, value) {
+				var args;
+				if (name === "length") {
+					args = new Array(Math.max(value - this.length, 0));
+					args.unshift(Math.min(this.length, value), Math.max(this.length - value, 0));
 					splice.apply(this, args);
-					return this.length;
-				},
-
-				/**
-				 * Reverses the order of the elements of an array
-				 * and automatically emits a splice type of change record.
-				 * @returns {Array} The array itself.
-				 */
-				reverse: function () {
-					var changeRecord = {
-							type: "splice",
-							object: this,
-							index: 0,
-							removed: this.slice(),
-							addedCount: this.length
-						},
-						result = EMPTY_ARRAY.reverse.apply(this, arguments);
-					// Treat this change as a splice instead of updates in each entry
-					Observable.getNotifier(this).notify(changeRecord);
-					return result;
-				},
-
-				/**
-				 * Removes the first element from an array
-				 * and automatically emits a change record compatible with
-				 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
-				 * @returns The element removed.
-				 */
-				shift: function () {
-					return splice.call(this, 0, 1)[0];
-				},
-
-				/**
-				 * Sorts the elements of an array in place
-				 * and automatically emits a splice type of change record.
-				 * @returns {Array} The array itself.
-				 */
-				sort: function () {
-					var changeRecord = {
-							type: "splice",
-							object: this,
-							index: 0,
-							removed: this.slice(),
-							addedCount: this.length
-						},
-						result = EMPTY_ARRAY.sort.apply(this, arguments);
-					// Treat this change as a splice instead of updates in each entry
-					Observable.getNotifier(this).notify(changeRecord);
-					return result;
-				},
-
-				/**
-				 * Adds one or more elements to the front of an array
-				 * and automatically emits a change record compatible with
-				 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
-				 * @param {...Anything} var_args The elements to add to the front of the array.
-				 * @returns The new length of the array.
-				 */
-				unshift: function () {
-					var args = [0, 0];
-					EMPTY_ARRAY.push.apply(args, arguments);
+				} else if (!isNaN(name) && +name >= this.length) {
+					args = new Array(name - this.length);
+					args.push(value);
+					args.unshift(this.length, 0);
 					splice.apply(this, args);
-					return this.length;
+				} else {
+					Observable.prototype.set.call(this, name, value);
 				}
-			};
-		})();
-	}
+				return value;
+			},
+
+			/**
+			 * Removes the last element from an array
+			 * and automatically emits a change record compatible with
+			 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
+			 * @returns The element removed.
+			 */
+			pop: function () {
+				return splice.call(this, -1, 1)[0];
+			},
+
+			/**
+			 * Adds one or more elements to the end of an array
+			 * and automatically emits a change record compatible with
+			 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
+			 * @param {...Anything} var_args The elements to add to the end of the array.
+			 * @returns The new length of the array.
+			 */
+			push: function () {
+				var args = [this.length, 0];
+				EMPTY_ARRAY.push.apply(args, arguments);
+				splice.apply(this, args);
+				return this.length;
+			},
+
+			/**
+			 * Reverses the order of the elements of an array
+			 * and automatically emits a splice type of change record.
+			 * @returns {Array} The array itself.
+			 */
+			reverse: function () {
+				var changeRecord = {
+						type: "splice",
+						object: this,
+						index: 0,
+						removed: this.slice(),
+						addedCount: this.length
+					},
+					result = EMPTY_ARRAY.reverse.apply(this, arguments);
+				// Treat this change as a splice instead of updates in each entry
+				Observable.getNotifier(this).notify(changeRecord);
+				return result;
+			},
+
+			/**
+			 * Removes the first element from an array
+			 * and automatically emits a change record compatible with
+			 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
+			 * @returns The element removed.
+			 */
+			shift: function () {
+				return splice.call(this, 0, 1)[0];
+			},
+
+			/**
+			 * Sorts the elements of an array in place
+			 * and automatically emits a splice type of change record.
+			 * @returns {Array} The array itself.
+			 */
+			sort: function () {
+				var changeRecord = {
+						type: "splice",
+						object: this,
+						index: 0,
+						removed: this.slice(),
+						addedCount: this.length
+					},
+					result = EMPTY_ARRAY.sort.apply(this, arguments);
+				// Treat this change as a splice instead of updates in each entry
+				Observable.getNotifier(this).notify(changeRecord);
+				return result;
+			},
+
+			/**
+			 * Adds one or more elements to the front of an array
+			 * and automatically emits a change record compatible with
+			 * {@link http://wiki.ecmascript.org/doku.php?id=harmony:observe ECMAScript Harmony Array.observe()}.
+			 * @param {...Anything} var_args The elements to add to the front of the array.
+			 * @returns The new length of the array.
+			 */
+			unshift: function () {
+				var args = [0, 0];
+				EMPTY_ARRAY.push.apply(args, arguments);
+				splice.apply(this, args);
+				return this.length;
+			}
+		};
+	})();
 
 	/**
 	 * Observes an ObservableArray for changes.
@@ -296,19 +270,9 @@ define([
 				var doneIncoming = false,
 					indexAdjustment = 0;
 				for (var i = 0; i < merged.length; ++i) {
-					var entry;
-					if (!has("object-observe-api") || !Object.isFrozen(merged[i])) {
-						entry = merged[i];
-						entry.index += indexAdjustment;
-					} else {
-						entry = merged[i] = {
-							type: "splice",
-							object: merged[i].object,
-							index: merged[i].index + indexAdjustment,
-							removed: merged[i].removed,
-							addedCount: merged[i].addedCount
-						};
-					}
+					var entry = merged[i];
+					entry.index += indexAdjustment;
+
 					/* jshint maxlen:150 */
 					var amount = intersect(entry.index, entry.index + entry.addedCount, incoming.index, incoming.index + incoming.removed.length);
 					if (amount >= 0) {
@@ -355,27 +319,17 @@ define([
 				callback(merged);
 			}
 		}
-		if (has("object-observe-api")) {
-			return function (observableArray, callback) {
-				Array.observe(observableArray, callback = observeSpliceCallback.bind(observableArray, callback));
-				return {
-					deliver: Object.deliverChangeRecords.bind(Object, callback),
-					remove: Array.unobserve.bind(Array, observableArray, callback)
-				};
-			};
-		} else {
-			return function (observableArray, callback) {
-				var h = Object.create(Observable.observe(observableArray,
-					callback = observeSpliceCallback.bind(observableArray, callback), [
-					"add",
-					"update",
-					"delete",
-					"splice"
-				]));
-				h.deliver = Observable.deliverChangeRecords.bind(Observable, callback);
-				return h;
-			};
-		}
+		return function (observableArray, callback) {
+			var h = Object.create(Observable.observe(observableArray,
+				callback = observeSpliceCallback.bind(observableArray, callback), [
+				"add",
+				"update",
+				"delete",
+				"splice"
+			]));
+			h.deliver = Observable.deliverChangeRecords.bind(Observable, callback);
+			return h;
+		};
 	})();
 
 	return ObservableArray;
