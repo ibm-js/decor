@@ -20,19 +20,14 @@ define(["./features"], function (has) {
 			dua = n.userAgent,
 			dav = n.appVersion;
 
+		// Special test for iOS 13.1+, to counteract misleading userAgent string.
+		var ios13 = /Safari/.test(dua) && "ontouchstart" in document;
+
 		// Platform detection
-		has.add("mac", /Macintosh/.test(dav));
-		if (dua.match(/(iPhone|iPod|iPad)/)) {
-			var p = RegExp.$1.replace(/P/, "p");
-			var v = dua.match(/OS ([\d_]+)/) ? RegExp.$1 : "1";
-			var os = parseFloat(v.replace(/_/, ".").replace(/_/g, ""));
-			has.add(p, os);		// "iphone", "ipad" or "ipod"
-			has.add("ios", os);
-		}
+		has.add("mac", /Macintosh/.test(dav) && !ios13);
+		has.add("ios", /iPhone|iPod|iPad/.test(dua) || ios13);
 		has.add("android", parseFloat(dua.split("Android ")[1]) || undefined);
-
 		has.add("msapp", parseFloat(dua.split("MSAppHost/")[1]) || undefined);
-
 		has.add("wp", parseFloat(dua.split("Windows Phone ")[1]) || undefined);
 
 		// Browser detection
