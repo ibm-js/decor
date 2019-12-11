@@ -103,7 +103,7 @@ define([
 					configurable: false,
 					value: proto[prop]
 				});
-				
+
 				// Setup ES5 getter and setter for this property, unless it already has custom ones.
 				var descriptor = Object.getOwnPropertyDescriptor(proto, prop);
 				if (!descriptor.set) {
@@ -196,7 +196,7 @@ define([
 		 */
 		_set: function (name, value) {
 			var shadowPropName = propNames(name).s;
-			
+
 			// Add the shadow property to the instance, masking what's in the prototype.
 			// Use Object.defineProperty() so it's hidden from for(var key in ...) and Object.keys().
 			Object.defineProperty(this, shadowPropName, {
@@ -278,8 +278,8 @@ define([
 				advise.after(this, "_notify", function (args) {
 					h.notify(args[0], args[1]);
 				}),
-				advise.after(this, "deliver", h.deliver.bind(h)),
-				advise.after(this, "discardChanges", h.discardChanges.bind(h))
+				advise.after(this, "_deliver", h.deliver.bind(h)),
+				advise.after(this, "_discardChanges", h.discardChanges.bind(h))
 			];
 
 			return {
@@ -307,15 +307,31 @@ define([
 		},
 
 		/**
+		 * Don't call this directly, it's a hook-point to register calls to Notifier#deliver().
+		 * @private
+		 */
+		_deliver: function () {
+		},
+
+		/**
+		 * Don't call this directly, it's a hook-point to register calls to Notifier#discardChanges().
+		 * @private
+		 */
+		_discardChanges: function () {
+		},
+
+		/**
 		 * Synchronously deliver change records to all listeners registered via `observe()`.
 		 */
 		deliver: function () {
+			this._deliver();
 		},
 
 		/**
 		 * Discard change records for all listeners registered via `observe()`.
 		 */
 		discardChanges: function () {
+			this._discardChanges();
 		}
 	}, {
 		enumerable: false

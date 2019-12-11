@@ -387,6 +387,38 @@ define(function (require) {
 			}), 10);
 		},
 
+		"overriding Stateful#deliver()": function () {
+			var log = [];
+			var MyStateful = dcl(Stateful, {
+				// Properties.
+				foo: undefined,
+				bar: undefined,
+
+				// Override Stateful#deliver() to test that sup.apply() calls observe() callbacks.
+				deliver: dcl.superCall(function (sup) {
+					return function () {
+						log.push("deliver before");
+						sup.apply(this, arguments);
+						log.push("deliver after");
+					};
+				})
+			});
+			var stateful = new MyStateful({
+				foo: "Foo0",
+				bar: "Bar0"
+			});
+			stateful.observe(function () {
+				log.push("observer 1");
+			});
+			stateful.observe(function () {
+				log.push("observer 2");
+			});
+			stateful.foo = "Foo1";
+			stateful.bar = "Bar1";
+			stateful.deliver();
+			assert.deepEqual(log, ["deliver before", "observer 1", "observer 2", "deliver after"], "deliver()");
+		},
+
 		"observe filter": function () {
 			// Check to make sure reported changes are consistent between platforms with and without Object.observe()
 			// native support
