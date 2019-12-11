@@ -1,15 +1,15 @@
-define(function (require) {
+define(function () {
 	"use strict";
 
 	var registerSuite = intern.getPlugin("interface.object").registerSuite;
-	var pollUntil = require("@theintern/leadfoot/helpers/pollUntil").default;
+	var pollUntil = requirejs.nodeRequire("@theintern/leadfoot/helpers/pollUntil").default;
 	var assert = intern.getPlugin("chai").assert;
 
 	registerSuite("Sniff tests", {
 		"Checking browser and platform sniffing": function () {
 			var remote = this.remote;
 			return remote
-				.get(require.toUrl("decor/tests/functional/sniff.html"))
+				.get("decor/tests/functional/sniff.html")
 				.then(pollUntil("return ('ready' in window && ready) ? true : null;", [],
 					intern.config.WAIT_TIMEOUT, intern.config.POLL_INTERVAL))
 				.execute("return _has")

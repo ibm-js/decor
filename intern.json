@@ -17,7 +17,10 @@
 		"loader": {
 			"script": "./intern-requirejs-loader.js",
 			"options": {
-				"baseUrl": "."
+				"baseUrl": "./node_modules",
+				"packages": [
+					{ "name": "decor", "location": ".." }
+				]
 			}
 		}
 	},
@@ -26,9 +29,9 @@
 		"loader": {
 			"script": "decor/intern-requirejs-loader.js",
 			"options": {
-				"baseUrl": "../../..",
+				"baseUrl": "../../../decor/node_modules",
 				"packages": [
-					{ "name": "intern", "location": "decor/node_modules/intern" }
+					{ "name": "decor", "location": ".." }
 				]
 			}
 		}
@@ -48,7 +51,7 @@
 	],
 
 	"functionalSuites": [
-		"./tests/functional/sniff"
+		"decor/tests/functional/sniff"
 	],
 
 	"coverage": [

@@ -1,24 +1,32 @@
 {
-	"name": "decor",
-	"version": "0.7.0",
+	"name": "ibm-decor",
+	"version": "0.8.0",
+	"description": "core infrastructure at the root of the delite projects",
+	"homepage": "http://ibm-js.github.io/decor/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ibm-js/decor"
+	},
+	"bugs": "https://github.com/ibm-js/decor/issues",
 	"dependencies": {
-		"npm": "^6.4.0"
+		"dcl": "^2.0.6",
+		"requirejs": "2.1.x",
+		"requirejs-dplugins": "0.6.x"
 	},
 	"devDependencies": {
-		"jshint": "~2.5.1",
+		"grunt": "^1.0.4",
+		"grunt-contrib-jshint": "^2.1.0",
 		"intern": "4.4.x",
+		"jsdoc-amddcl": "git://github.com/ibm-js/jsdoc-amddcl.git#master",
+		"jshint": "^2.10.3",
 		"leadfoot": "1.x",
-		"grunt": "~0.4.2",
-		"grunt-contrib-jshint": "~0.6.3",
-		"jsdoc-amddcl": "git://github.com/ibm-js/jsdoc-amddcl#master",
-		"requirejs": "2.1.x"
+		"requirejs": "2.1.x",
+		"requirejs-domready": "2.0.x"
 	},
 	"licenses": [
 		{
 			"type": "BSD",
 			"url": "https://github.com/ibm-js/decor/blob/master/LICENSE"
 		}
-	],
-	"bugs": "https://github.com/ibm-js/decor/issues",
-	"private": true
+	]
 }
