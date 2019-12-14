@@ -18,18 +18,15 @@ All contributions require a [Dojo Foundation CLA](http://dojofoundation.org/abou
 
 ## Installation
 
-_Bower_ release installation:
+npm release installation:
 
-    $ bower install decor
+    $ npm install ibm-decor
 
 _Manual_ master installation:
 
     $ git clone git://github.com/ibm-js/decor.git
-
-Then install dependencies with bower (or manually from github if you prefer):
-
-	$ cd decor
-	$ bower install
+    $ cd decor
+    $ npm install
 
 ## Documentation
 

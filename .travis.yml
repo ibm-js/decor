@@ -6,10 +6,8 @@ language: node_js
 node_js: "0.10"
 sudo: false
 install:
-  - npm -g install bower
   - npm -g install grunt-cli
   - npm install
-  - yes | bower install
 script:
   - grunt jshint
   - npx intern config=@sauce
