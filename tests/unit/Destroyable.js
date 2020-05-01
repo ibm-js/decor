@@ -5,7 +5,6 @@ define(function (require) {
 	var assert = intern.getPlugin("chai").assert;
 	var advise = require("dcl/advise");
 	var dcl = require("dcl/dcl");
-	var Promise = require("requirejs-dplugins/Promise!");
 	var Destroyable = require("decor/Destroyable");
 	var Stateful = require("decor/Stateful");
 	var has = require("decor/features");
