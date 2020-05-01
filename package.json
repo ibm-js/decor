@@ -10,7 +10,7 @@
 	"bugs": "https://github.com/ibm-js/decor/issues",
 	"dependencies": {
 		"dcl": "^2.0.6",
-		"requirejs-dplugins": "0.6.x"
+		"requirejs-dplugins": "0.7.x"
 	},
 	"devDependencies": {
 		"grunt": "^1.0.4",
