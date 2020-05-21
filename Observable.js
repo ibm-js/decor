@@ -188,8 +188,6 @@ define([
 		hotCallbacks = {},
 		deliverHandle = null,
 		deliverAllByTimeout = function () {
-			/* global Platform */
-			has("polymer-platform") && Platform.performMicrotaskCheckpoint(); // For Polymer watching for Observable
 			for (var anyWorkDone = true; anyWorkDone;) {
 				anyWorkDone = false;
 				// Observation may stop during observer callback
