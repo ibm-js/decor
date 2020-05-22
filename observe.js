@@ -38,8 +38,16 @@ define([
 		// Array of functions to call whenever a property or nested property of the POJO is changed.
 		var callbacks = map.get(pojo);
 
+		// Function to call callbacks when a property has changed.
+		function notify(prop, oldVal, newVal) {
+			callbacks.forEach(function (watcher) {
+				watcher(prop, oldVal, newVal);
+			});
+		}
+
 		if (!callbacks) {
 			callbacks = [];
+
 			map.set(pojo, callbacks);
 
 			// Go through each property in the object, and convert it to a custom setter and getter.
@@ -51,7 +59,7 @@ define([
 				var nestedWatcher;
 				if (isObject(curVal)) {
 					nestedWatcher = watchPojo(curVal, function (nestedProp, nestedOldVal, nestedNewVal) {
-						callback(prop + "." + nestedProp, nestedOldVal, nestedNewVal);
+						notify(prop + "." + nestedProp, nestedOldVal, nestedNewVal);
 					});
 				}
 
@@ -74,19 +82,13 @@ define([
 						// If new value is an object, set up listener on that object.
 						if (isObject(newVal)) {
 							nestedWatcher = watchPojo(newVal, function (nestedProp, nestedOldVal, nestedNewVal) {
-								callback(prop + "." + nestedProp, nestedOldVal, nestedNewVal);
+								notify(prop + "." + nestedProp, nestedOldVal, nestedNewVal);
 							});
 						}
 
 						// Save new value.
 						var oldVal = curVal;
 						curVal = newVal;
-
-						function notify(prop, oldVal, newVal) {
-							callbacks.forEach(function (watcher) {
-								watcher(prop, oldVal, newVal);
-							});
-						}
 
 						if (isObject(oldVal) && isObject(newVal)) {
 							// Recursive diff oldVal vs. newVal and send notifications of nested prop changes.
