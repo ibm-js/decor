@@ -214,7 +214,7 @@ define(function (require) {
 
 		"nested": function () {
 			var dfd = this.async(1000);
-			var log = [];
+			var log = [], log2 = [];
 			var pojo = {
 				foo: "Foo0",
 				bar: "Bar0",
@@ -230,6 +230,9 @@ define(function (require) {
 			handles.push(observe(pojo, function (oldVals) {
 				log.push(oldVals);
 			}));
+			handles.push(observe(pojo, function (oldVals) {
+				log2.push(oldVals);
+			}));
 
 			// Change nested property.
 			pojo.nested1.a = 2;
@@ -240,10 +243,16 @@ define(function (require) {
 						"nested1.a": 1
 					}
 				], "change in nested1");
+				assert.deepEqual(log2, [
+					{
+						"nested1.a": 1
+					}
+				], "change in nested1, second listener");
 
 				assert.strictEqual(pojo.nested1.a, 2, "new nested1.a");
 
 				log = [];
+				log2 = [];
 
 				pojo.nested1.nested2.c = 4;
 
@@ -253,8 +262,14 @@ define(function (require) {
 							"nested1.nested2.c": 3
 						}
 					], "changed in nested2");
+					assert.deepEqual(log, [
+						{
+							"nested1.nested2.c": 3
+						}
+					], "changed in nested2, second listener");
 
 					log = [];
+					log2 = [];
 
 					// Change whole object.
 					var oldNested1 = pojo.nested1;
@@ -274,8 +289,15 @@ define(function (require) {
 								"nested1.nested2.d": 4
 							}
 						], "new nested1");
+						assert.deepEqual(log2, [
+							{
+								"nested1.a": 2,
+								"nested1.nested2.d": 4
+							}
+						], "new nested1, second listener");
 
 						log = [];
+						log2 = [];
 
 						// Check that changes to new nested1 are tracked and conversely,
 						// that changes to old nested1 are *not* tracked.
@@ -288,6 +310,11 @@ define(function (require) {
 									"nested1.b": 2
 								}
 							], "changes to new nested1 tracked, changes to old nested1 not tracked");
+							assert.deepEqual(log, [
+								{
+									"nested1.b": 2
+								}
+							], "changes to new nested1 tracked, changes to old nested1 not tracked, second listener");
 						}), 1);
 					}), 1);
 				}), 1);
