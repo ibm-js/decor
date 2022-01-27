@@ -13,11 +13,11 @@
 		"requirejs-dplugins": "0.7.x"
 	},
 	"devDependencies": {
-		"grunt": "^1.0.4",
+		"grunt": "^1.4.1",
 		"grunt-contrib-jshint": "^2.1.0",
 		"intern": "4.4.x",
 		"jsdoc-amddcl": "git://github.com/ibm-js/jsdoc-amddcl.git#master",
-		"jshint": "^2.10.3",
+		"jshint": "^2.13.4",
 		"leadfoot": "1.x",
 		"requirejs": "2.1.x",
 		"requirejs-domready": "2.0.x"
