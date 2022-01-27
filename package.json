@@ -15,7 +15,7 @@
 	"devDependencies": {
 		"grunt": "^1.4.1",
 		"grunt-contrib-jshint": "^2.1.0",
-		"intern": "4.4.x",
+		"intern": "^4.10.1",
 		"jsdoc-amddcl": "git://github.com/ibm-js/jsdoc-amddcl.git#master",
 		"jshint": "^2.13.4",
 		"leadfoot": "1.x",

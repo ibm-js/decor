@@ -28,6 +28,6 @@ _Manual_ master installation:
     $ cd decor
     $ npm install
 
-## Documentation
+## Testing
 
-See [here](http://ibm-js.github.io/decor/docs/master/index.html).
+    $ npx intern
