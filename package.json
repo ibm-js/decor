@@ -19,7 +19,7 @@
 		"jsdoc-amddcl": "git://github.com/ibm-js/jsdoc-amddcl.git#master",
 		"jshint": "^2.13.4",
 		"leadfoot": "1.x",
-		"requirejs": "2.1.x",
+		"requirejs": "2.3.x",
 		"requirejs-domready": "2.0.x"
 	},
 	"licenses": [
